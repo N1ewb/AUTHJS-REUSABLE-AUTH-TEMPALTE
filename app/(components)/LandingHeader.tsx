@@ -10,10 +10,16 @@ export default function LandingHeader() {
       <div className="nav-links flex-1 flex items-center justify-end gap-10">
         <Link href="/login">Login</Link>
         <Link
-          href="/register"
+          href="/studentregistration"
           className="bg-[#101010] rounded-2xl px-8 py-2 text-white"
         >
-          Register
+          Register as Student
+        </Link>
+        <Link
+          href="/instructorregistration"
+          className="bg-[#101010] rounded-2xl px-8 py-2 text-white"
+        >
+          Register as Instructor
         </Link>
       </div>
     </div>

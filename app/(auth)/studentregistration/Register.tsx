@@ -1,5 +1,6 @@
 "use client";
-import { SignupForm } from "@/components/forms/RegisterForm";
+
+import { SignupForm } from "@/components/forms/StudentRegisterForm";
 import React from "react";
 
 export default function Register() {

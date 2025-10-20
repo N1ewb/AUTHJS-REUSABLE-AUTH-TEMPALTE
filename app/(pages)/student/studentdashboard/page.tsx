@@ -1,10 +1,10 @@
 import React from "react";
-import Dashboard from "./Dashboard";
+import StudentDashboard from "./studentdashboard";
 
 export default function DashboardPage() {
   return (
     <div className="flex">
-      <Dashboard />
+      <StudentDashboard />
     </div>
   );
 }

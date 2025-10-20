@@ -1,6 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import api from "./api";
+import { Role } from "./types";
 
 export const { signIn, signOut, auth, handlers } = NextAuth({
   providers: [
@@ -51,7 +52,7 @@ export const { signIn, signOut, auth, handlers } = NextAuth({
       session.user.email = token.email as string;
       session.user.first_name = token.first_name as string;
       session.user.last_name = token.last_name as string;
-      session.user.role = token.role as string;
+      session.user.role = token.role as Role;
       session.user.api_token = token.api_token as string;
       return session;
     },
