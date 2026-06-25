@@ -24,6 +24,9 @@ export const signinschema = z
     email: z.string().email().nonempty("Email is required!"),
     first_name: z.string().nonempty("First name is required!"),
     last_name: z.string().nonempty("Last name is required!"),
+    role: z.enum(["student", "instructor", "admin"], {
+      required_error: "Role is required!",
+    }),
     password: z
       .string()
       .min(8, "Password should at least be 8 characters")
@@ -52,6 +55,7 @@ export function SignupForm() {
       last_name: "",
       password: "",
       confirm_password: "",
+      role: "student",
     },
   });
 

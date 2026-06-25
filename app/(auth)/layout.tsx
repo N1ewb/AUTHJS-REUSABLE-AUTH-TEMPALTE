@@ -9,7 +9,9 @@ export default async function AuthLayout({
   const session = await auth();
 
   if (session && session.user && session.user.role)
-    redirect(`/${session.user.role.toLowerCase()}/dashboard`);
+    redirect(
+      `/${session.user.role.toLowerCase()}/${session.user.role.toLowerCase()}dashboard`
+    );
 
   return <>{children}</>;
 }
