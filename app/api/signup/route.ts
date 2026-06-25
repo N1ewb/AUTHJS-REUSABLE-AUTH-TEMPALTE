@@ -14,8 +14,9 @@ const rateLimiter = new RateLimiterMemory({
 export async function POST(req: Request) {
   try {
     // Get client IP for rate limiting
+    const forwarded = req.headers.get("x-forwarded-for");
     const ip =
-      req.headers.get("x-forwarded-for") ||
+      forwarded?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
@@ -23,7 +24,6 @@ export async function POST(req: Request) {
     try {
       await rateLimiter.consume(ip);
     } catch (rateLimiterError) {
-      console.warn("Rate limit triggered for IP:", ip, rateLimiterError);
       return NextResponse.json(
         {
           user: null,
@@ -115,8 +115,6 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Signup error:", error);
-
     // Handle specific error cases
     if (
       error instanceof Error &&

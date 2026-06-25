@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sign } from "jsonwebtoken";
+import { compare } from "bcrypt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret-key";
 
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,17 +35,23 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
-
+    const passwordValid = await compare(password, user.password);
+    if (!passwordValid) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
+    }
     const token = sign(
       {
         id: user.user_id,
         email: user.email,
       },
       JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     return NextResponse.json({
@@ -58,16 +65,9 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error during login:", error);
-
-    // Add more detailed error logging
-    if (error instanceof Error) {
-      console.error("Error details:", error.message);
-    }
-
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   } finally {
     // Explicitly disconnect in development

@@ -14,6 +14,7 @@ import {
 } from "../../components/ui/form";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { signUp } from "@/actions/client/user.action";
@@ -41,6 +42,7 @@ export type SignupData = z.infer<typeof signinschema>;
 
 export function SignupForm() {
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signinschema>>({
     resolver: zodResolver(signinschema),
@@ -59,17 +61,17 @@ export function SignupForm() {
     try {
       setLoading(true);
       const res = await signUp(values);
-      console.log("values", values);
-      console.log("RES", res);
-      if (res && res.data.status === "success") {
+
+      if (res && res.success) {
         toast({
-          title: "Sign in",
-          description: " Signed in successfully",
+          title: "Sign up",
+          description: res.message,
         });
+        router.push("/login");
       } else {
         toast({
-          title: "Sign in",
-          description: " Signed in failed",
+          title: "Sign up",
+          description: res?.message || "Sign up failed",
           variant: "destructive",
         });
       }

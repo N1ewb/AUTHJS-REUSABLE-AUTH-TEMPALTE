@@ -42,7 +42,6 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof loginschema>) {
     try {
       setLoading(true);
-      console.log(form.formState.errors);
 
       const res = await login(values);
       if (res.success) {
@@ -59,7 +58,6 @@ export function LoginForm() {
         });
       }
     } catch (error) {
-      console.log("Error occured: ", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
