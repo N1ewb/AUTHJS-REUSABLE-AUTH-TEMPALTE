@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     // Check if the IP is rate limited
     try {
       await rateLimiter.consume(ip);
-    } catch (rateLimiterError) {
+    } catch {
       return NextResponse.json(
         {
           user: null,

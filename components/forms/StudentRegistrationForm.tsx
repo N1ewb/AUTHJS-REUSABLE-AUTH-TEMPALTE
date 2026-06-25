@@ -11,9 +11,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+} from "../ui/form";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -24,9 +24,7 @@ export const signinschema = z
     email: z.string().email().nonempty("Email is required!"),
     first_name: z.string().nonempty("First name is required!"),
     last_name: z.string().nonempty("Last name is required!"),
-    role: z.enum(["student", "instructor", "admin"], {
-      required_error: "Role is required!",
-    }),
+    role: z.string().min(1, "Role is required!"),
     password: z
       .string()
       .min(8, "Password should at least be 8 characters")
@@ -43,7 +41,7 @@ export const signinschema = z
 
 export type SignupData = z.infer<typeof signinschema>;
 
-export function SignupForm() {
+export function StudentRegistrationForm() {
   const { toast } = useToast();
   const router = useRouter();
 

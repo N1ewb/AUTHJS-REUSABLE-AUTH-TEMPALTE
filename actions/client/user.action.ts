@@ -1,7 +1,7 @@
 "use server";
 
 import { LoginFormData } from "@/components/forms/LoginForm";
-import { SignupData } from "@/components/forms/RegisterForm";
+import { SignupData } from "@/components/forms/StudentRegistrationForm";
 
 import prisma from "@/lib/db";
 import { hash } from "bcrypt";
@@ -24,7 +24,10 @@ export async function signUp(values: SignupData) {
     });
 
     if (existingUser) {
-      return { success: false, message: "User with this email already exists!" };
+      return {
+        success: false,
+        message: "User with this email already exists!",
+      };
     }
 
     const hashedPassword = await hash(values.password, 10);
@@ -35,22 +38,29 @@ export async function signUp(values: SignupData) {
         first_name: values.first_name,
         last_name: values.last_name,
         password: hashedPassword,
-        role: "user",
+        role: values.role,
       },
     });
 
     return { success: true, message: "User created successfully" };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return { success: false, message: "User with this email already exists!" };
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return {
+        success: false,
+        message: "User with this email already exists!",
+      };
     }
-    return { success: false, message: "An error occurred during sign up" };
+    const message =
+      error instanceof Error ? error.message : "An error occurred during sign up";
+    return { success: false, message };
   }
 }
 
 export async function logout() {
   try {
     await signOut({ redirect: true });
-  } catch (error) {
-  }
+  } catch (error) {}
 }
