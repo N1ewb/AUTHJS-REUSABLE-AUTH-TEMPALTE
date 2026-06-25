@@ -1,6 +1,7 @@
 import DashboardHeader from "@/app/(components)/DashboardHeader";
+import Sidebar from "@/app/(components)/Sidebar";
 
-export default async function EducatorLayout({
+export default async function InstructorLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -8,7 +9,8 @@ export default async function EducatorLayout({
   return (
     <main className="flex flex-1">
       <DashboardHeader />
-      <div className="flex flex-1">{children}</div>
+      <Sidebar role="instructor" />
+      <div className="flex flex-1 pt-16">{children}</div>
     </main>
   );
 }

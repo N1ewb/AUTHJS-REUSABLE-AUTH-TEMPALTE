@@ -7,7 +7,7 @@ export default function DashboardHeader() {
   return (
     <header className="fixed w-full flex items-center justify-between px-8 py-4 border-b bg-white z-50">
       <Link href="/dashboard" className="font-bold text-lg">
-        Live Quiz
+        RAGEBAITER BECOME RAGEBAITED
       </Link>
       <div className="flex items-center gap-6">
         <UserDropdown />

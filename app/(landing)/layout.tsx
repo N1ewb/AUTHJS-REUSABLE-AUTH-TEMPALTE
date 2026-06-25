@@ -5,7 +5,7 @@ export default async function LandingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-screen flex flex-1">
+    <main className="flex flex-col min-h-screen">
       <LandingHeader />
       {children}
     </main>

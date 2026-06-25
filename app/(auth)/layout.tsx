@@ -10,11 +10,11 @@ export default async function AuthLayout({
   const session = await auth();
 
   if (session && session.user && session.user.role) {
-    redirect(`/${session.user.role}/${session.user.role}dashboard`);
+    redirect(`/${session.user.role}/dashboard`);
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <LandingHeader />
       {children}
     </div>
