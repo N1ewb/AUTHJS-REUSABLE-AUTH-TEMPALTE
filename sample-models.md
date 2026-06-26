@@ -1,0 +1,135 @@
+# Sample Prisma Models
+
+```prisma
+enum Role {
+  GUEST
+  STUDENT
+  INSTRUCTOR
+}
+
+enum QuizType {
+  LIVE
+  PREMADE
+  PUZZLE
+  PROGRAMMING
+}
+
+enum QuestionType {
+  MCQ
+  IDENTIFICATION
+  TRUE_FALSE
+  CODING
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String?   @unique
+  passwordHash   String?
+  name           String
+  role           Role      @default(STUDENT)
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  quizzes        Quiz[]
+  attempts       QuizAttempt[]
+}
+
+model Quiz {
+  id             String       @id @default(cuid())
+  title          String
+  description    String?
+  type           QuizType     @default(PREMADE)
+  code           String?      @unique
+  timeLimit      Int?         // in minutes
+  passingScore   Int?
+  maxAttempts    Int          @default(1)
+  shuffleQuestions Boolean    @default(false)
+  isPublished    Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  instructorId   String
+  instructor     User         @relation(fields: [instructorId], references: [id])
+  questions      Question[]
+  attempts       QuizAttempt[]
+  sessions       LiveSession[]
+  lectureId      String?
+  lecture        Lecture?     @relation(fields: [lectureId], references: [id])
+}
+
+model Question {
+  id             String       @id @default(cuid())
+  text           String
+  type           QuestionType @default(MCQ)
+  points         Int          @default(1)
+  order          Int
+  options        Json?        // for MCQ: array of {label, text, isCorrect}
+  answer         String?      // correct answer text for identification/true-false
+  codeTemplate   String?      // for coding questions
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  quizId         String
+  quiz           Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers        Answer[]
+}
+
+model QuizAttempt {
+  id             String       @id @default(cuid())
+  score          Int?
+  totalPoints    Int?
+  startedAt      DateTime     @default(now())
+  submittedAt    DateTime?
+  tabSwitches    Int          @default(0) // anti-cheat tracking
+  isFlagged      Boolean      @default(false) // flagged for suspicious activity
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  quizId         String
+  quiz           Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers        Answer[]
+  sessionId      String?
+  session        LiveSession? @relation(fields: [sessionId], references: [id])
+
+  @@unique([userId, quizId])
+}
+
+model Answer {
+  id             String       @id @default(cuid())
+  response       Json?        // student's answer (text, selected option, code)
+  isCorrect      Boolean?
+  pointsAwarded  Int          @default(0)
+  createdAt      DateTime     @default(now())
+
+  attemptId      String
+  attempt        QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question     @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
+}
+
+model LiveSession {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  isActive       Boolean      @default(true)
+  startedAt      DateTime     @default(now())
+  endedAt        DateTime?
+
+  quizId         String
+  quiz           Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  attempts       QuizAttempt[]
+}
+
+model Lecture {
+  id             String       @id @default(cuid())
+  title          String
+  filePath       String
+  fileType       String       // pdf, docx, etc.
+  content        String?      // extracted text for AI processing
+  createdAt      DateTime     @default(now())
+
+  quizzes        Quiz[]
+}
+```

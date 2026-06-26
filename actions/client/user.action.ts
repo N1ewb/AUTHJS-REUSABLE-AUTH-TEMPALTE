@@ -6,7 +6,7 @@ import { SignupData } from "@/components/forms/StudentRegistrationForm";
 import prisma from "@/lib/db";
 import { hash } from "bcrypt";
 import { signIn, signOut } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 
 export async function login(data: LoginFormData) {
   try {
@@ -31,14 +31,20 @@ export async function signUp(values: SignupData) {
     }
 
     const hashedPassword = await hash(values.password, 10);
+    const name = `${values.first_name} ${values.last_name}`.trim();
+
+    const roleMap: Record<string, Role> = {
+      student: Role.STUDENT,
+      instructor: Role.INSTRUCTOR,
+      admin: Role.INSTRUCTOR,
+    };
 
     await prisma.user.create({
       data: {
         email: values.email,
-        first_name: values.first_name,
-        last_name: values.last_name,
-        password: hashedPassword,
-        role: values.role,
+        name,
+        passwordHash: hashedPassword,
+        role: roleMap[values.role] ?? Role.STUDENT,
       },
     });
 

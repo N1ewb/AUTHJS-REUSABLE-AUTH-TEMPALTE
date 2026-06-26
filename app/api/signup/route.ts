@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 import { hash } from "bcrypt";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 
 // Configure rate limiter - adjust these values based on your needs
 const rateLimiter = new RateLimiterMemory({
@@ -36,9 +36,9 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const { email, first_name, last_name, password, role } = body;
+    const name = `${first_name} ${last_name}`.trim();
 
-    // Validate required fields
-    if (!email || !first_name || !last_name || !password) {
+    if (!email || !name || !password) {
       return NextResponse.json(
         {
           user: null,
@@ -87,19 +87,23 @@ export async function POST(req: Request) {
 
         const hashedPassword = await hash(password, 10);
 
+        const roleMap: Record<string, Role> = {
+          student: Role.STUDENT,
+          instructor: Role.INSTRUCTOR,
+          admin: Role.INSTRUCTOR,
+        };
+
         return await tx.user.create({
           data: {
             email,
-            first_name,
-            last_name,
-            password: hashedPassword,
-            role,
+            name,
+            passwordHash: hashedPassword,
+            role: roleMap[role] ?? Role.STUDENT,
           },
           select: {
-            user_id: true,
+            id: true,
             email: true,
-            first_name: true,
-            last_name: true,
+            name: true,
             role: true,
           },
         });
@@ -108,7 +112,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        user: result,
+        user: {
+          ...result,
+          first_name: result.name,
+          last_name: "",
+        },
         message: "User created successfully",
         status: "success",
       },

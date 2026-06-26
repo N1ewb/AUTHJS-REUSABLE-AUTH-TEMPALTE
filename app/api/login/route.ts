@@ -17,17 +17,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Use a transaction to ensure connection is properly handled
     const user = await prisma.$transaction(async (tx) => {
       return await tx.user.findUnique({
         where: { email },
         select: {
-          user_id: true,
+          id: true,
           email: true,
-          first_name: true,
-          last_name: true,
+          name: true,
           role: true,
-          password: true,
+          passwordHash: true,
         },
       });
     });
@@ -38,7 +36,13 @@ export async function POST(req: Request) {
         { status: 401 },
       );
     }
-    const passwordValid = await compare(password, user.password);
+    if (!user.passwordHash) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
+    }
+    const passwordValid = await compare(password, user.passwordHash);
     if (!passwordValid) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -47,7 +51,7 @@ export async function POST(req: Request) {
     }
     const token = sign(
       {
-        id: user.user_id,
+        id: user.id,
         email: user.email,
       },
       JWT_SECRET,
@@ -57,10 +61,10 @@ export async function POST(req: Request) {
     return NextResponse.json({
       token,
       user: {
-        id: user.user_id,
+        id: user.id,
         email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        first_name: user.name,
+        last_name: "",
         role: user.role,
       },
     });

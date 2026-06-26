@@ -9,8 +9,15 @@ export default async function AuthLayout({
 }>) {
   const session = await auth();
 
-  if (session && session.user && session.user.role) {
-    redirect(`/${session.user.role}/dashboard`);
+  const validRoles = ["instructor", "student", "admin"];
+
+  if (
+    session &&
+    session.user &&
+    session.user.role &&
+    validRoles.includes(session.user.role.toLowerCase())
+  ) {
+    redirect(`/${session.user.role.toLowerCase()}/dashboard`);
   }
 
   return (
