@@ -30,8 +30,10 @@ export type SessionData = {
   id: string;
   code: string;
   isActive: boolean;
+  currentQuestion: number | null;
   startedAt: Date;
   endedAt: Date | null;
+  quizId: string;
   quiz: {
     id: string;
     title: string;
@@ -45,4 +47,12 @@ export type SessionData = {
       answer: string | null;
     }[];
   };
+  participants: {
+    id: string;
+    userId: string;
+    name: string;
+    email: string;
+    joinedAt: string;
+    score: number | null;
+  }[];
 };

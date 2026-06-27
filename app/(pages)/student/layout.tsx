@@ -8,10 +8,10 @@ export default async function StudentLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex flex-1">
+    <main className="flex flex-1 flex-grow min-h-0">
       <DashboardHeader />
       <Sidebar role="student" />
-      <div className="flex flex-1 flex-col pt-16 px-8 py-6">
+      <div className="flex flex-1 flex-col pt-20 px-8 py-6 flex-grow min-h-0">
         <Breadcrumbs />
         {children}
       </div>

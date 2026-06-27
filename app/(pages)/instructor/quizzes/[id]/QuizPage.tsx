@@ -72,14 +72,16 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             <p className="flex flex-col">
               AVG Score <span className="text-2xl font-semibold">12</span>
             </p>
+
             <div className="line w-[1px] h-full bg-gray-400"></div>
             <p className="flex flex-col">
-              Participants <span className="text-2xl font-semibold">12</span>
+              Attempts{" "}
+              <span className="text-2xl font-semibold">
+                {"HOW MANY SESSIONS DID THIS QUIZ HAVE"}
+              </span>
             </p>
             <div className="line w-[1px] h-full bg-gray-400"></div>
-            <p className="flex flex-col">
-              Submissions <span className="text-2xl font-semibold">12</span>
-            </p>
+            <p className="flex flex-col">Vieww Attempt History </p>
           </div>
 
           <div className="mt-3">

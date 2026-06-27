@@ -11,11 +11,14 @@ const typeLabels: Record<string, string> = {
   PROGRAMMING: "Programming",
 };
 
-function QuizCard({ quiz }: { quiz: QuizData }) {
+function QuizCard({ quiz, href }: { quiz: QuizData; href?: string }) {
   const tags = Array.isArray(quiz.tags) ? quiz.tags : [];
 
   return (
-    <Link href={`/instructor/quizzes/${quiz.id}`}>
+    <Link
+      className="flex min-w-[400px] max-w-[400px]"
+      href={href ?? `/instructor/quizzes/${quiz.id}`}
+    >
       <div className="bg-white rounded-xl border p-1 hover:border-[#56205E]/40 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
         <Image src={QuizDefaultBg} alt={"Default BG"} className="rounded-lg" />
 

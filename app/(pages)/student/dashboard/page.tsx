@@ -1,7 +1,5 @@
-import React from "react";
+import StudentDashboard from "./StudentDashboard";
 
-function StudentDashbordPage() {
-  return <div>StudentDashbordPage</div>;
+export default function StudentDashboardPage() {
+  return <StudentDashboard />;
 }
-
-export default StudentDashbordPage;

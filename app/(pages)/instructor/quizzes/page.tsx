@@ -1,11 +1,14 @@
-import { getQuizzes } from "@/actions/client/quiz.action";
-import Quizzes from "./Quizzes";
+import { getQuizzes, getInstructorSessionHistory } from "@/actions/client/quiz.action";
+import QuizzesSection from "./QuizzesSection";
 import QuizCardSkeleton from "@/app/(components)/QuizCardSkeleton";
 
 export default async function InstructorQuizzesPage() {
-  const quizzes = await getQuizzes();
+  const [quizzes, sessions] = await Promise.all([
+    getQuizzes(),
+    getInstructorSessionHistory(),
+  ]);
   if (!quizzes) {
     return <QuizCardSkeleton />;
   }
-  return <Quizzes quizzes={quizzes} />;
+  return <QuizzesSection quizzes={quizzes as any} sessions={sessions} />;
 }

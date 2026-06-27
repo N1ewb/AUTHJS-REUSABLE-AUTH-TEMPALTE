@@ -118,11 +118,13 @@ model Answer {
 }
 
 model LiveSession {
-  id        String    @id @default(cuid())
-  code      String    @unique
-  isActive  Boolean   @default(true)
-  startedAt DateTime  @default(now())
-  endedAt   DateTime?
+  id              String    @id @default(cuid())
+  code            String    @unique
+  isActive        Boolean   @default(true)
+  cancelled       Boolean   @default(false)
+  currentQuestion Int?
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
 
   quizId    String
   quiz      Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)

@@ -5,9 +5,9 @@ import QuizPage from "./QuizPage";
 export default async function QuizDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const { id } = await params;
   const quiz = await getQuizById(id);
   if (!quiz) notFound();
 

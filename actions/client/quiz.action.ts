@@ -60,6 +60,27 @@ export async function getQuizById(id: string) {
   };
 }
 
+export async function getStudentQuizHistory() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  return prisma.quizAttempt.findMany({
+    where: { userId: session.user.id },
+    include: {
+      quiz: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          code: true,
+          _count: { select: { questions: true } },
+        },
+      },
+    },
+    orderBy: { startedAt: "desc" },
+  });
+}
+
 export async function getQuizzes() {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -288,6 +309,63 @@ export async function startLiveSession(quizId: string) {
   return liveSession;
 }
 
+export async function joinLiveSession(code: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { code },
+    include: {
+      _count: { select: { attempts: true } },
+      quiz: {
+        select: {
+          id: true,
+          title: true,
+          _count: { select: { questions: true } },
+        },
+      },
+    },
+  });
+
+  if (!liveSession || !liveSession.isActive)
+    throw new Error("Session not found or no longer active");
+
+  const existingAttempt = await prisma.quizAttempt.findUnique({
+    where: {
+      userId_quizId: { userId: session.user.id, quizId: liveSession.quizId },
+    },
+  });
+
+  if (existingAttempt) {
+    await prisma.quizAttempt.update({
+      where: { id: existingAttempt.id },
+      data: { sessionId: liveSession.id },
+    });
+  } else {
+    await prisma.quizAttempt.create({
+      data: {
+        userId: session.user.id,
+        quizId: liveSession.quizId,
+        sessionId: liveSession.id,
+      },
+    });
+  }
+
+  return {
+    id: liveSession.id,
+    code: liveSession.code,
+    isActive: liveSession.isActive,
+    startedAt: liveSession.startedAt.toISOString(),
+    endedAt: liveSession.endedAt?.toISOString() ?? null,
+    participantCount: liveSession._count.attempts,
+    quiz: {
+      id: liveSession.quiz.id,
+      title: liveSession.quiz.title,
+      _count: liveSession.quiz._count,
+    },
+  };
+}
+
 export async function getLiveSession(id: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -306,11 +384,260 @@ export async function getLiveSession(id: string) {
           },
         },
       },
+      attempts: {
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+        },
+        orderBy: { startedAt: "asc" },
+      },
     },
   });
 
   if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
     throw new Error("Not found");
 
-  return liveSession;
+  return {
+    id: liveSession.id,
+    code: liveSession.code,
+    isActive: liveSession.isActive,
+    cancelled: liveSession.cancelled,
+    currentQuestion: liveSession.currentQuestion,
+    startedAt: liveSession.startedAt,
+    endedAt: liveSession.endedAt,
+    quizId: liveSession.quizId,
+    quiz: liveSession.quiz,
+    participants: liveSession.attempts.map((a) => ({
+      id: a.id,
+      userId: a.user.id,
+      name: a.user.name,
+      email: a.user.email ?? "",
+      joinedAt: a.startedAt.toISOString(),
+      score: a.score,
+    })),
+  };
+}
+
+export async function cancelLiveSession(id: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id },
+    include: { quiz: { select: { instructorId: true } } },
+  });
+
+  if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
+    throw new Error("Not found");
+  if (!liveSession.isActive) throw new Error("Session already ended");
+
+  await prisma.liveSession.update({
+    where: { id },
+    data: { isActive: false, cancelled: true, endedAt: new Date() },
+  });
+}
+
+export async function endLiveSession(id: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id },
+    include: { quiz: { select: { instructorId: true } } },
+  });
+
+  if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
+    throw new Error("Not found");
+  if (!liveSession.isActive) throw new Error("Session already ended");
+
+  await prisma.liveSession.update({
+    where: { id },
+    data: { isActive: false, endedAt: new Date() },
+  });
+}
+
+export async function getLiveQuestion(sessionId: string, questionNumber: number) {
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id: sessionId },
+    select: { currentQuestion: true },
+  });
+
+  if (!liveSession) throw new Error("Session not found");
+
+  const question = await prisma.question.findFirst({
+    where: { quiz: { sessions: { some: { id: sessionId } } }, order: questionNumber },
+    select: {
+      id: true,
+      text: true,
+      type: true,
+      points: true,
+      order: true,
+      options: true,
+      answer: true,
+    },
+  });
+
+  if (!question) throw new Error("Question not found");
+
+  return {
+    id: question.id,
+    text: question.text,
+    type: question.type as string,
+    points: question.points,
+    order: question.order,
+    options: question.options as unknown,
+    answer: question.answer,
+  };
+}
+
+export async function startQuizSession(id: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id },
+    include: {
+      quiz: { select: { instructorId: true, _count: { select: { questions: true } } } },
+    },
+  });
+
+  if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
+    throw new Error("Not found");
+  if (!liveSession.isActive) throw new Error("Session already ended");
+  if (liveSession.quiz._count.questions === 0)
+    throw new Error("Quiz has no questions");
+
+  await prisma.liveSession.update({
+    where: { id },
+    data: { currentQuestion: 1 },
+  });
+}
+
+export async function advanceQuestion(id: string, questionNumber: number) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id },
+    include: {
+      quiz: { select: { instructorId: true, _count: { select: { questions: true } } } },
+    },
+  });
+
+  if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
+    throw new Error("Not found");
+  if (!liveSession.isActive) throw new Error("Session already ended");
+  if (questionNumber < 1 || questionNumber > liveSession.quiz._count.questions)
+    throw new Error("Invalid question number");
+
+  await prisma.liveSession.update({
+    where: { id },
+    data: { currentQuestion: questionNumber },
+  });
+}
+
+export async function getSessionStatus(id: string) {
+  const s = await prisma.liveSession.findUnique({
+    where: { id },
+    select: { isActive: true, cancelled: true, currentQuestion: true, startedAt: true, endedAt: true },
+  });
+  return s as typeof s & { cancelled: boolean };
+}
+
+export async function getSessionParticipants(sessionId: string) {
+  const attempts = await prisma.quizAttempt.findMany({
+    where: { sessionId },
+    select: {
+      id: true,
+      score: true,
+      startedAt: true,
+      userId: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { startedAt: "asc" },
+  });
+
+  return attempts.map((a) => ({
+    id: a.id,
+    userId: a.user.id,
+    name: a.user.name,
+    email: a.user.email ?? "",
+    joinedAt: a.startedAt.toISOString(),
+    score: a.score,
+  }));
+}
+
+export async function getStudentAttempt(sessionId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const attempt = await prisma.quizAttempt.findFirst({
+    where: { sessionId, userId: session.user.id },
+    select: {
+      id: true,
+      score: true,
+      totalPoints: true,
+      startedAt: true,
+      submittedAt: true,
+      quiz: {
+        select: {
+          title: true,
+          _count: { select: { questions: true } },
+        },
+      },
+    },
+  });
+
+  if (!attempt) throw new Error("Attempt not found");
+
+  return {
+    id: attempt.id,
+    score: attempt.score,
+    totalPoints: attempt.totalPoints,
+    startedAt: attempt.startedAt.toISOString(),
+    submittedAt: attempt.submittedAt?.toISOString() ?? null,
+    quizTitle: attempt.quiz.title,
+    totalQuestions: attempt.quiz._count.questions,
+  };
+}
+
+export type InstructorSessionHistoryItem = {
+  id: string;
+  code: string;
+  isActive: boolean;
+  cancelled: boolean;
+  startedAt: string;
+  endedAt: string | null;
+  quizTitle: string;
+  quizId: string;
+  participantCount: number;
+};
+
+export async function getInstructorSessionHistory() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSessions = await prisma.liveSession.findMany({
+    where: {
+      quiz: { instructorId: session.user.id },
+      isActive: false,
+    },
+    include: {
+      quiz: { select: { id: true, title: true } },
+      _count: { select: { attempts: true } },
+    },
+    orderBy: { endedAt: "desc" },
+    take: 50,
+  });
+
+  return liveSessions.map((s) => ({
+    id: s.id,
+    code: s.code,
+    isActive: s.isActive,
+    cancelled: s.cancelled,
+    startedAt: s.startedAt.toISOString(),
+    endedAt: s.endedAt?.toISOString() ?? null,
+    quizTitle: s.quiz.title,
+    quizId: s.quiz.id,
+    participantCount: s._count.attempts,
+  }));
 }

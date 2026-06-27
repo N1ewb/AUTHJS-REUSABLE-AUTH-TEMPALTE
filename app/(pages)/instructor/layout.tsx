@@ -8,10 +8,10 @@ export default async function InstructorLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex flex-1 flex-grow min-h-0">
+    <main className="flex flex-1 flex-grow min-h-0 min-w-0">
       <Sidebar role="instructor" />
       <DashboardHeader />
-      <div className="flex flex-1 flex-col pt-20 px-8 py-6 flex-grow min-h-0">
+      <div className="flex flex-1 flex-col pt-20 px-8 py-6 flex-grow min-h-0 min-w-0">
         <Breadcrumbs />
         {children}
       </div>

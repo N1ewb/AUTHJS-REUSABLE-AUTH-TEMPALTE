@@ -439,11 +439,11 @@ function CreateQuiz() {
   };
 
   return (
-    <div className="flex gap-4 ">
-      <div className="flex-1 min-w-0">
+    <div className="flex gap-4 min-h-0 flex-col flex-grow">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col">
         {/* Progress Indicator */}
         <div className="mb-10">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between ">
             {STEPS.map((step, index) => (
               <div key={step.id} className="flex items-center flex-1">
                 <div className="flex flex-col items-center">
@@ -485,10 +485,10 @@ function CreateQuiz() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-xl border p-6 md:p-8">
+        <div className="bg-white rounded-xl border p-6 md:p-8 flex flex-col flex-grow min-h-0">
           {/* Step 1: Details (Title + Tags) */}
           {currentStep === 1 && (
-            <div className="space-y-8">
+            <div className="flex flex-col space-y-8 min-h-0 ">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Quiz Details
@@ -588,8 +588,8 @@ function CreateQuiz() {
 
           {/* Step 2: Questions */}
           {currentStep === 2 && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between  ">
+            <div className="space-y-6 flex-grow flex flex-col min-h-0 ">
+              <div className="flex items-center justify-between  min-h-0">
                 <div className="">
                   <h2 className=" text-xl font-semibold text-gray-900">
                     Quiz Questions
@@ -610,24 +610,34 @@ function CreateQuiz() {
               </div>
               {/* Question Form */}
               {showQuestionForm && (
-                <div className="bg-gray-50 rounded-lg border p-5 space-y-4 ">
+                <div className="bg-gray-50 rounded-lg border p-5 space-y-4 flex flex-col ">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-gray-900">
                       {editingQuestionId ? "Edit Question" : "New Question"}
                     </h3>
-                    <button
-                      onClick={resetQuestionForm}
-                      className="text-sm text-gray-500 hover:text-gray-700"
-                    >
-                      Cancel
-                    </button>
+
+                    <div className="flex flex-row-reverse align-middle justify-center items-center  gap-10">
+                      <button
+                        onClick={resetQuestionForm}
+                        className="text-sm text-red-500 hover:text-gray-700 flex flex-grow"
+                      >
+                        Cancel
+                      </button>
+
+                      <Button
+                        onClick={saveQuestion}
+                        className="bg-[#56205E] hover:bg-[#4A1A52] text-white"
+                      >
+                        {editingQuestionId ? "Update Question" : "Add Question"}
+                      </Button>
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="flex flex-col min-h-0 ">
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Question Type
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 min-h-0 ">
                       {QUESTION_TYPES.map((qt) => (
                         <button
                           key={qt.value}
@@ -782,21 +792,12 @@ function CreateQuiz() {
                       Coding question editor coming soon
                     </div>
                   )}
-
-                  <div className="flex justify-end pt-2">
-                    <Button
-                      onClick={saveQuestion}
-                      className="bg-[#56205E] hover:bg-[#4A1A52] text-white"
-                    >
-                      {editingQuestionId ? "Update Question" : "Add Question"}
-                    </Button>
-                  </div>
                 </div>
               )}
 
               {/* Question List */}
               {questions.length > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-3 flex flex-col min-h-0 overflow-auto">
                   {questions.map((q, index) => (
                     <div
                       key={q.id}
