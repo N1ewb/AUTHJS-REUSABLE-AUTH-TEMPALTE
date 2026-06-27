@@ -10,5 +10,5 @@ export default async function DashboardLayout({
   const session: Session | null = await auth();
   if (!session) return redirect(`/`);
 
-  return <>{children}</>;
+  return <div className="flex flex-col min-h-0">{children}</div>;
 }

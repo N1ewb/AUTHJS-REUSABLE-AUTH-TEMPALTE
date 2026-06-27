@@ -75,7 +75,7 @@ export default function Sidebar({ role }: { role: "instructor" | "student" }) {
 
   return (
     <aside
-      className={`bg-white border-r min-h-screen pt-20 hidden lg:flex flex-col transition-all duration-200 ${
+      className={`bg-white border-r pt-20 hidden h-screen max-h-screen lg:flex flex-col transition-all duration-200  ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
@@ -110,7 +110,9 @@ export default function Sidebar({ role }: { role: "instructor" | "student" }) {
           );
         })}
       </nav>
-      <div className={`px-3 pb-4 border-t pt-3 flex flex-col gap-1 ${collapsed ? "items-center" : ""}`}>
+      <div
+        className={`px-3 pb-4 border-t pt-3 flex flex-col gap-1 ${collapsed ? "items-center" : ""}`}
+      >
         {bottomLinks.map((link) => (
           <Link
             key={link.label}
@@ -119,8 +121,18 @@ export default function Sidebar({ role }: { role: "instructor" | "student" }) {
               collapsed ? "justify-center px-0" : ""
             }`}
           >
-            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d={link.icon} />
+            <svg
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d={link.icon}
+              />
             </svg>
             {!collapsed && link.label}
           </Link>
@@ -132,8 +144,22 @@ export default function Sidebar({ role }: { role: "instructor" | "student" }) {
           }`}
           title={collapsed ? "Expand sidebar" : "Minimize sidebar"}
         >
-          <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={collapsed ? "M8.25 4.5l7.5 7.5-7.5 7.5" : "M15.75 19.5L8.25 12l7.5-7.5"} />
+          <svg
+            className="w-5 h-5 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={
+                collapsed
+                  ? "M8.25 4.5l7.5 7.5-7.5 7.5"
+                  : "M15.75 19.5L8.25 12l7.5-7.5"
+              }
+            />
           </svg>
           {!collapsed && "Minimize"}
         </button>

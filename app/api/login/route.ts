@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         email: user.email,
         first_name: user.name,
         last_name: "",
-        role: user.role,
+        role: user.role.toLowerCase(),
       },
     });
   } catch {

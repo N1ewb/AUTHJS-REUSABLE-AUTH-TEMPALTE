@@ -1,7 +1,7 @@
-import React from "react";
+import dynamic from "next/dynamic";
 
-function CreateQuizPage() {
-  return <div>CreateQuizPage</div>;
+const CreateQuiz = dynamic(() => import("./CreateQuiz"), { ssr: false });
+
+export default function CreateQuizPage() {
+  return <CreateQuiz />;
 }
-
-export default CreateQuizPage;

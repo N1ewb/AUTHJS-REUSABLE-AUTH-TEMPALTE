@@ -114,6 +114,7 @@ export async function POST(req: Request) {
       {
         user: {
           ...result,
+          role: result.role.toLowerCase(),
           first_name: result.name,
           last_name: "",
         },

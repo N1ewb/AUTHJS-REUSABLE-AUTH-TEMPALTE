@@ -1,7 +1,11 @@
-import React from "react";
+import { getQuizzes } from "@/actions/client/quiz.action";
+import Quizzes from "./Quizzes";
+import QuizCardSkeleton from "@/app/(components)/QuizCardSkeleton";
 
-function InstructorQuizzesPage() {
-  return <div>InstructorQuizzesPage</div>;
+export default async function InstructorQuizzesPage() {
+  const quizzes = await getQuizzes();
+  if (!quizzes) {
+    return <QuizCardSkeleton />;
+  }
+  return <Quizzes quizzes={quizzes} />;
 }
-
-export default InstructorQuizzesPage;

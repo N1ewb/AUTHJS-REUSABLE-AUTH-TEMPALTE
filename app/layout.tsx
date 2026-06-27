@@ -20,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
+      <body
+        className={`${poppins.className} max-h-screen flex flex-col overflow-hidden`}
+      >
         {children}
         <Toaster />
       </body>
