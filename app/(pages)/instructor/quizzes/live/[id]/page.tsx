@@ -1,4 +1,4 @@
-import { getLiveSession, getQuizById } from "@/actions/client/quiz.action";
+import { getLiveSession } from "@/actions/client/quiz.action";
 import { notFound } from "next/navigation";
 import QuizLiveSessionPage from "./QuizLiveSessionPage";
 
@@ -10,7 +10,6 @@ export default async function QuizSession({
   const { id } = await params;
   const session = await getLiveSession(id);
   if (!session) notFound();
-  const quiz = await getQuizById(session.quizId) ?? undefined;
 
-  return <QuizLiveSessionPage session={session} quiz={quiz} />;
+  return <QuizLiveSessionPage session={session} />;
 }

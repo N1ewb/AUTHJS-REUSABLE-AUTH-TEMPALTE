@@ -2,7 +2,7 @@
 
 import { getSessionStatus } from "@/actions/client/quiz.action";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 function StudentQuestionPage({
   sessionId,

@@ -1,6 +1,6 @@
 "use client";
 
-import { QuizData, SessionData } from "@/lib/types";
+import { SessionData } from "@/lib/types";
 import Image from "next/image";
 import DefaultBG from "../../../../../../assets/quizpage-default.png";
 import CopyInviteCode from "@/app/(components)/CopyInviteCode";
@@ -15,10 +15,8 @@ import { useTransition } from "react";
 
 function QuizLiveSessionPage({
   session,
-  quiz,
 }: {
   session: SessionData;
-  quiz?: QuizData;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

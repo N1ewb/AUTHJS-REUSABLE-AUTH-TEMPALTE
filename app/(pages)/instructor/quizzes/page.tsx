@@ -10,5 +10,5 @@ export default async function InstructorQuizzesPage() {
   if (!quizzes) {
     return <QuizCardSkeleton />;
   }
-  return <QuizzesSection quizzes={quizzes as any} sessions={sessions} />;
+  return <QuizzesSection quizzes={quizzes} sessions={sessions} />;
 }

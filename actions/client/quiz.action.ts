@@ -85,11 +85,37 @@ export async function getQuizzes() {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  return prisma.quiz.findMany({
+  const quizzes = await prisma.quiz.findMany({
     where: { instructorId: session.user.id },
     include: { _count: { select: { questions: true } } },
     orderBy: { createdAt: "desc" },
   });
+
+  return quizzes.map((q) => ({
+    id: q.id,
+    title: q.title,
+    description: q.description,
+    type: q.type as string,
+    code: q.code,
+    isPublished: q.isPublished,
+    activeSessionId: null as string | null,
+    timeLimit: q.timeLimit,
+    passingScore: q.passingScore,
+    maxAttempts: q.maxAttempts,
+    shuffleQuestions: q.shuffleQuestions,
+    createdAt: q.createdAt.toISOString(),
+    tags: q.tags as unknown,
+    _count: q._count,
+    questions: [] as {
+      id: string;
+      text: string;
+      type: string;
+      points: number;
+      order: number;
+      options: unknown;
+      answer: string | null;
+    }[],
+  }));
 }
 
 export async function createQuiz(data: {
