@@ -2,7 +2,12 @@
 
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
-import type { QuizQuestion, QuizQuestionOption, QuizType, QuestionType } from "@/lib/types";
+import type {
+  QuizQuestion,
+  QuizQuestionOption,
+  QuizType,
+  QuestionType,
+} from "@/lib/types";
 
 function generateCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -141,7 +146,17 @@ export async function createQuiz(data: {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const { title, description, type, timeLimit, passingScore, maxAttempts, shuffleQuestions, selectedTags, questions } = data;
+  const {
+    title,
+    description,
+    type,
+    timeLimit,
+    passingScore,
+    maxAttempts,
+    shuffleQuestions,
+    selectedTags,
+    questions,
+  } = data;
 
   if (!title || !questions?.length) {
     throw new Error("Title and questions are required");
@@ -188,7 +203,7 @@ export async function addQuestion(
     points: number;
     options?: { label: string; text: string; isCorrect: boolean }[];
     answer?: string | null;
-  }
+  },
 ) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -221,7 +236,7 @@ export async function updateQuestion(
     points: number;
     options?: { label: string; text: string; isCorrect: boolean }[];
     answer?: string | null;
-  }
+  },
 ) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -405,7 +420,15 @@ export async function getLiveSession(id: string) {
           title: true,
           instructorId: true,
           questions: {
-            select: { id: true, text: true, type: true, points: true, order: true, options: true, answer: true },
+            select: {
+              id: true,
+              text: true,
+              type: true,
+              points: true,
+              order: true,
+              options: true,
+              answer: true,
+            },
             orderBy: { order: "asc" },
           },
         },
@@ -489,7 +512,9 @@ export async function computeSessionScores(id: string) {
 
   const questionMap = new Map(questions.map((q) => [q.id, q]));
   let totalPoints = 0;
-  questions.forEach((q) => { totalPoints += q.points; });
+  questions.forEach((q) => {
+    totalPoints += q.points;
+  });
 
   for (const attempt of attempts) {
     let score = 0;
@@ -498,16 +523,29 @@ export async function computeSessionScores(id: string) {
       const question = questionMap.get(answer.questionId);
       if (!question) continue;
 
-      const response = answer.response as { label: string; text: string } | null;
+      const response = answer.response as {
+        label: string;
+        text: string;
+      } | null;
       if (!response) continue;
 
       let isCorrect = false;
 
       if (question.type === "MCQ" && Array.isArray(question.options)) {
-        const correctOption = (question.options as { label: string; text: string; isCorrect: boolean }[]).find((o) => o.isCorrect);
+        const correctOption = (
+          question.options as {
+            label: string;
+            text: string;
+            isCorrect: boolean;
+          }[]
+        ).find((o) => o.isCorrect);
         isCorrect = correctOption?.label === response.label;
-      } else if (question.type === "TRUE_FALSE" || question.type === "IDENTIFICATION") {
-        isCorrect = question.answer?.toLowerCase() === response.text.toLowerCase();
+      } else if (
+        question.type === "TRUE_FALSE" ||
+        question.type === "IDENTIFICATION"
+      ) {
+        isCorrect =
+          question.answer?.toLowerCase() === response.text.toLowerCase();
       }
 
       if (isCorrect) {
@@ -548,7 +586,10 @@ export async function endLiveSession(id: string) {
   });
 }
 
-export async function getLiveQuestion(sessionId: string, questionNumber: number) {
+export async function getLiveQuestion(
+  sessionId: string,
+  questionNumber: number,
+) {
   const liveSession = await prisma.liveSession.findUnique({
     where: { id: sessionId },
     select: { currentQuestion: true },
@@ -557,7 +598,10 @@ export async function getLiveQuestion(sessionId: string, questionNumber: number)
   if (!liveSession) throw new Error("Session not found");
 
   const question = await prisma.question.findFirst({
-    where: { quiz: { sessions: { some: { id: sessionId } } }, order: questionNumber },
+    where: {
+      quiz: { sessions: { some: { id: sessionId } } },
+      order: questionNumber,
+    },
     select: {
       id: true,
       text: true,
@@ -577,12 +621,16 @@ export async function getLiveQuestion(sessionId: string, questionNumber: number)
     type: question.type as QuestionType,
     points: question.points,
     order: question.order,
-      options: question.options as unknown as QuizQuestionOption[] | null,
+    options: question.options as unknown as QuizQuestionOption[] | null,
     answer: question.answer,
   };
 }
 
-export async function submitAnswer(sessionId: string, questionId: string, response: { label: string; text: string }) {
+export async function submitAnswer(
+  sessionId: string,
+  questionId: string,
+  response: { label: string; text: string },
+) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
@@ -613,7 +661,9 @@ export async function startQuizSession(id: string) {
   const liveSession = await prisma.liveSession.findUnique({
     where: { id },
     include: {
-      quiz: { select: { instructorId: true, _count: { select: { questions: true } } } },
+      quiz: {
+        select: { instructorId: true, _count: { select: { questions: true } } },
+      },
     },
   });
 
@@ -636,7 +686,9 @@ export async function advanceQuestion(id: string, questionNumber: number) {
   const liveSession = await prisma.liveSession.findUnique({
     where: { id },
     include: {
-      quiz: { select: { instructorId: true, _count: { select: { questions: true } } } },
+      quiz: {
+        select: { instructorId: true, _count: { select: { questions: true } } },
+      },
     },
   });
 
@@ -655,7 +707,13 @@ export async function advanceQuestion(id: string, questionNumber: number) {
 export async function getSessionStatus(id: string) {
   const s = await prisma.liveSession.findUnique({
     where: { id },
-    select: { isActive: true, cancelled: true, currentQuestion: true, startedAt: true, endedAt: true },
+    select: {
+      isActive: true,
+      cancelled: true,
+      currentQuestion: true,
+      startedAt: true,
+      endedAt: true,
+    },
   });
   return s as typeof s & { cancelled: boolean };
 }
@@ -683,7 +741,10 @@ export async function getSessionParticipants(sessionId: string) {
   }));
 }
 
-export async function getQuestionSubmissions(sessionId: string, questionId: string) {
+export async function getQuestionSubmissions(
+  sessionId: string,
+  questionId: string,
+) {
   const attempts = await prisma.quizAttempt.findMany({
     where: { sessionId },
     select: {
@@ -703,8 +764,8 @@ export async function getQuestionSubmissions(sessionId: string, questionId: stri
     submitted: a.answers.length > 0,
     answer:
       a.answers.length > 0
-        ? (a.answers[0].response as { label: string; text: string } | null)
-            ?.label ?? null
+        ? ((a.answers[0].response as { label: string; text: string } | null)
+            ?.label ?? null)
         : null,
   }));
 }
@@ -790,10 +851,20 @@ export async function getStudentActiveSession() {
   if (!session?.user?.id) return null;
 
   const attempt = await prisma.quizAttempt.findFirst({
-    where: { userId: session.user.id, sessionId: { not: null }, submittedAt: null },
+    where: {
+      userId: session.user.id,
+      sessionId: { not: null },
+      submittedAt: null,
+    },
     include: {
       session: {
-        select: { id: true, isActive: true, currentQuestion: true, code: true, quizId: true },
+        select: {
+          id: true,
+          isActive: true,
+          currentQuestion: true,
+          code: true,
+          quizId: true,
+        },
       },
     },
     orderBy: { startedAt: "desc" },
@@ -809,150 +880,3 @@ export async function getStudentActiveSession() {
   };
 }
 
-export type InstructorQuiz = {
-  instructorId: string;
-  instructorName: string;
-  quizzes: {
-    id: string;
-    title: string;
-    type: string;
-    description: string | null;
-    questionCount: number;
-  }[];
-};
-
-export async function getInstructorQuizzes() {
-  const session = await auth();
-  if (!session?.user?.id) return [];
-
-  const attempts = await prisma.quizAttempt.findMany({
-    where: { userId: session.user.id },
-    select: { quiz: { select: { instructorId: true } } },
-    distinct: ["quizId"],
-  });
-
-  const instructorIds = Array.from(new Set(attempts.map((a) => a.quiz.instructorId)));
-  if (instructorIds.length === 0) return [];
-
-  const instructors = await prisma.user.findMany({
-    where: { id: { in: instructorIds } },
-    select: {
-      id: true,
-      name: true,
-      quizzes: {
-        where: { isPublished: true },
-        select: {
-          id: true,
-          title: true,
-          type: true,
-          description: true,
-          _count: { select: { questions: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
-
-  return instructors.map((i) => ({
-    instructorId: i.id,
-    instructorName: i.name,
-    quizzes: i.quizzes.map((q) => ({
-      id: q.id,
-      title: q.title,
-      type: q.type,
-      description: q.description,
-      questionCount: q._count.questions,
-    })),
-  }));
-}
-
-export async function getInstructorStudents() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  const students = await prisma.user.findMany({
-    where: {
-      role: "STUDENT",
-      OR: [
-        { instructorId: session.user.id },
-        {
-          attempts: {
-            some: {
-              quiz: { instructorId: session.user.id },
-            },
-          },
-        },
-      ],
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-      _count: { select: { attempts: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return students.map((s) => ({
-    id: s.id,
-    name: s.name,
-    email: s.email,
-    joinedAt: s.createdAt.toISOString(),
-    attemptCount: s._count.attempts,
-  }));
-}
-
-function generateInviteCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
-
-export async function getInstructorInviteCode() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  let user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { inviteCode: true },
-  });
-
-  if (!user?.inviteCode) {
-    let code = generateInviteCode();
-    let exists = await prisma.user.findUnique({ where: { inviteCode: code } });
-    while (exists) {
-      code = generateInviteCode();
-      exists = await prisma.user.findUnique({ where: { inviteCode: code } });
-    }
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { inviteCode: code },
-    });
-    return code;
-  }
-
-  return user.inviteCode;
-}
-
-export async function linkStudentToInstructor(inviteCode: string) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  const instructor = await prisma.user.findUnique({
-    where: { inviteCode },
-    select: { id: true, role: true },
-  });
-
-  if (!instructor || instructor.role !== "INSTRUCTOR") {
-    throw new Error("Invalid invite code");
-  }
-
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { instructorId: instructor.id },
-  });
-}

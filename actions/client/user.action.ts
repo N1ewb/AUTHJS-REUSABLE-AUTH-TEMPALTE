@@ -44,7 +44,7 @@ export async function signUp(values: SignupData) {
         email: values.email,
         name,
         passwordHash: hashedPassword,
-        role: roleMap[values.role] ?? Role.STUDENT,
+        role: roleMap[values.role?.toLowerCase()] ?? Role.STUDENT,
       },
     });
 

@@ -35,14 +35,25 @@ model User {
   role         Role     @default(STUDENT)
   image        String?
   inviteCode   String?  @unique
-  instructorId String?
-  instructor   User?    @relation("InstructorStudents", fields: [instructorId], references: [id])
-  students     User[]   @relation("InstructorStudents")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  quizzes     Quiz[]
-  attempts    QuizAttempt[]
+  quizzes            Quiz[]
+  attempts           QuizAttempt[]
+  studentConnections StudentInstructor[] @relation("StudentConnections")
+  instructorFor      StudentInstructor[] @relation("InstructorFor")
+}
+
+model StudentInstructor {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+
+  studentId    String
+  instructorId String
+  student      User     @relation("StudentConnections", fields: [studentId], references: [id], onDelete: Cascade)
+  instructor   User     @relation("InstructorFor", fields: [instructorId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, instructorId])
 }
 
 model Quiz {

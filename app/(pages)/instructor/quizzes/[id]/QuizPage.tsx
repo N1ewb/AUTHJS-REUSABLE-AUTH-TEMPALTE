@@ -8,6 +8,7 @@ import PublishToggle from "@/app/(components)/PublishToggle";
 import QuizPageQuestions from "@/app/(components)/QuizPageQuestions";
 import StartLiveSessionButton from "@/app/(components)/StartLiveSessionButton";
 import { QuizData } from "@/lib/types";
+import CopyInviteCode from "@/app/(components)/CopyInviteCode";
 
 function QuizPage({ quiz }: { quiz: QuizData }) {
   const isLive = quiz.type === "LIVE";
@@ -88,6 +89,9 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             <p className="flex flex-col">
               Attempt History {"/Make this modal/ text: View"}
             </p>
+          </div>
+          <div className="flex">
+            <CopyInviteCode quizId={quiz.id} code={quiz.code} />
           </div>
         </div>
         <div className="w-[30%]">

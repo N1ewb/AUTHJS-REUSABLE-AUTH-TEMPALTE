@@ -98,7 +98,7 @@ export async function POST(req: Request) {
             email,
             name,
             passwordHash: hashedPassword,
-            role: roleMap[role] ?? Role.STUDENT,
+            role: roleMap[role?.toLowerCase()] ?? Role.STUDENT,
           },
           select: {
             id: true,

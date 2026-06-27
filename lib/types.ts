@@ -105,3 +105,25 @@ export type Submission = {
   submitted: boolean;
   answer: string | null;
 };
+
+export const typeLabels: Record<string, string> = {
+  PREMADE: "Pre-made",
+  LIVE: "Live",
+  PUZZLE: "Puzzle",
+  PROGRAMMING: "Programming",
+};
+
+export type Attempt = {
+  id: string;
+  score: number | null;
+  totalPoints: number | null;
+  startedAt: Date;
+  submittedAt: Date | null;
+  quiz: {
+    id: string;
+    title: string;
+    type: string;
+    code: string | null;
+    _count: { questions: number };
+  };
+};

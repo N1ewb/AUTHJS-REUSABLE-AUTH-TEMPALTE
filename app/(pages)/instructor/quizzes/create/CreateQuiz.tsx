@@ -626,7 +626,7 @@ function CreateQuiz() {
 
                       <Button
                         onClick={saveQuestion}
-                        className="bg-[#56205E] hover:bg-[#4A1A52] text-white"
+                        className="bg-green-700 hover:bg-[#4A1A52] text-white"
                       >
                         {editingQuestionId ? "Update Question" : "Add Question"}
                       </Button>
