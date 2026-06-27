@@ -1,7 +1,5 @@
-import React from "react";
+import InstructorStudents from "./InstructorStudents";
 
-function InstructorStudentsPage() {
-  return <div>InstructorStudentsPage</div>;
+export default function InstructorStudentsPage() {
+  return <InstructorStudents />;
 }
-
-export default InstructorStudentsPage;

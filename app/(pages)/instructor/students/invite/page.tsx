@@ -1,7 +1,5 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
-function InstructorInviteStudentsPage() {
-  return <div>InstructorInviteStudentsPage</div>;
+export default function InstructorInviteStudentsPage() {
+  redirect("/instructor/students");
 }
-
-export default InstructorInviteStudentsPage;

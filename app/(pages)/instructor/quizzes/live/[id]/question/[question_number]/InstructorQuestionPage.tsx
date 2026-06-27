@@ -1,9 +1,14 @@
 "use client";
 
-import { advanceQuestion, endLiveSession } from "@/actions/client/quiz.action";
+import {
+  advanceQuestion,
+  endLiveSession,
+  getQuestionSubmissions,
+} from "@/actions/client/quiz.action";
+import { QuizQuestion, Submission } from "@/lib/types";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 function InstructorQuestionPage({
   sessionId,
@@ -14,27 +19,31 @@ function InstructorQuestionPage({
 }: {
   sessionId: string;
   quizId: string;
-  question: {
-    id: string;
-    text: string;
-    type: string;
-    points: number;
-    order: number;
-    options: unknown;
-    answer: string | null;
-  };
+  question: QuizQuestion;
   questionNumber: number;
   totalQuestions: number;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    async function fetch() {
+      const data = await getQuestionSubmissions(sessionId, question.id);
+      setSubmissions(data);
+    }
+    fetch();
+    intervalRef.current = setInterval(fetch, 3000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [sessionId, question.id]);
 
   function goToQuestion(n: number) {
     startTransition(async () => {
       await advanceQuestion(sessionId, n);
-      router.push(
-        `/instructor/quizzes/live/${sessionId}/question/${n}`
-      );
+      router.push(`/instructor/quizzes/live/${sessionId}/question/${n}`);
     });
   }
 
@@ -84,6 +93,51 @@ function InstructorQuestionPage({
               {isPending ? "Ending..." : "End Quiz"}
             </button>
           )}
+        </div>
+      </div>
+      {question.type === "MCQ" && question.options && (
+        <div className="space-y-3 mb-6">
+          {question.options.map((option) => (
+            <div
+              key={option.label}
+              className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white"
+            >
+              <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600 shrink-0">
+                {option.label}
+              </span>
+              <span className="text-sm text-gray-900">{option.text}</span>
+              {option.isCorrect && (
+                <span className="ml-auto text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                  Correct
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="border-t pt-4">
+        <p className="text-sm font-medium text-gray-700 mb-3">
+          Student Submissions
+        </p>
+        <div className="space-y-2">
+          {submissions.map((s) => (
+            <div
+              key={s.userId}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50"
+            >
+              <span
+                className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                  s.submitted ? "bg-green-500" : "bg-red-400"
+                }`}
+              />
+              <span className="text-sm text-gray-700">{s.name}</span>
+              {s.submitted && s.answer && (
+                <span className="ml-auto text-xs text-gray-400">
+                  Answered: {s.answer}
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

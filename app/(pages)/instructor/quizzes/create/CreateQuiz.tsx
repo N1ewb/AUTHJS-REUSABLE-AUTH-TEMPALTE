@@ -979,7 +979,7 @@ function CreateQuiz() {
 
           {/* Step 4: Publish */}
           {currentStep === 4 && (
-            <div className="space-y-6">
+            <div className="space-y-6 min-h-0 overflow-auto">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Review & Publish
@@ -1080,21 +1080,6 @@ function CreateQuiz() {
                   </div>
                 </div>
               </div>
-
-              <Button
-                onClick={handlePublish}
-                disabled={loading}
-                className="w-full bg-[#56205E] hover:bg-[#4A1A52] text-white py-6 text-lg"
-              >
-                {loading ? (
-                  "Publishing..."
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Send className="w-5 h-5" />
-                    Publish Quiz
-                  </span>
-                )}
-              </Button>
             </div>
           )}
 
@@ -1111,13 +1096,28 @@ function CreateQuiz() {
             </Button>
 
             <div className="flex items-center gap-2">
-              {currentStep < 4 && (
+              {currentStep < 4 ? (
                 <Button
                   onClick={nextStep}
                   className="bg-[#56205E] hover:bg-[#4A1A52] text-white flex items-center gap-1"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlePublish}
+                  disabled={loading}
+                  className="bg-[#56205E] hover:bg-[#4A1A52] text-white flex items-center gap-1"
+                >
+                  {loading ? (
+                    "Publishing..."
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Send className="w-5 h-5" />
+                      Publish Quiz
+                    </span>
+                  )}
                 </Button>
               )}
             </div>

@@ -3,7 +3,6 @@ import Image from "next/image";
 import React from "react";
 import DefaultBG from "../../../../../assets/quizpage-default.png";
 import AddQuestionForm from "@/app/(components)/AddQuestionForm";
-import CopyInviteCode from "@/app/(components)/CopyInviteCode";
 import DeleteQuizButton from "@/app/(components)/DeleteQuizButton";
 import PublishToggle from "@/app/(components)/PublishToggle";
 import QuizPageQuestions from "@/app/(components)/QuizPageQuestions";
@@ -70,22 +69,25 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
           </div>
           <div className="text-[#56205E] flex gap-5 text-sm">
             <p className="flex flex-col">
-              AVG Score <span className="text-2xl font-semibold">12</span>
+              AVG Score{" "}
+              <span className="text-2xl font-semibold">
+                {quiz.averageScore != null
+                  ? Math.round(quiz.averageScore)
+                  : "—"}
+              </span>
             </p>
 
             <div className="line w-[1px] h-full bg-gray-400"></div>
             <p className="flex flex-col">
-              Attempts{" "}
+              Sessions{" "}
               <span className="text-2xl font-semibold">
-                {"HOW MANY SESSIONS DID THIS QUIZ HAVE"}
+                {quiz._count.sessions}
               </span>
             </p>
             <div className="line w-[1px] h-full bg-gray-400"></div>
-            <p className="flex flex-col">Vieww Attempt History </p>
-          </div>
-
-          <div className="mt-3">
-            <CopyInviteCode quizId={quiz.id} code={quiz.code} />
+            <p className="flex flex-col">
+              Attempt History {"/Make this modal/ text: View"}
+            </p>
           </div>
         </div>
         <div className="w-[30%]">

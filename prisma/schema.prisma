@@ -34,6 +34,10 @@ model User {
   name         String
   role         Role     @default(STUDENT)
   image        String?
+  inviteCode   String?  @unique
+  instructorId String?
+  instructor   User?    @relation("InstructorStudents", fields: [instructorId], references: [id])
+  students     User[]   @relation("InstructorStudents")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -98,8 +102,6 @@ model QuizAttempt {
   answers   Answer[]
   sessionId String?
   session   LiveSession? @relation(fields: [sessionId], references: [id])
-
-  @@unique([userId, quizId])
 }
 
 model Answer {

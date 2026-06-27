@@ -1,24 +1,15 @@
 "use client";
 
+import { StudentAttempt } from "@/lib/types";
 import { CheckCircle, Home, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-function StudentResults({
-  attempt,
-}: {
-  attempt: {
-    id: string;
-    score: number | null;
-    totalPoints: number | null;
-    startedAt: string;
-    submittedAt: string | null;
-    quizTitle: string;
-    totalQuestions: number;
-  };
-}) {
+function StudentResults({ attempt }: { attempt: StudentAttempt }) {
   const router = useRouter();
   const percentage =
-    attempt.score != null && attempt.totalPoints != null && attempt.totalPoints > 0
+    attempt.score != null &&
+    attempt.totalPoints != null &&
+    attempt.totalPoints > 0
       ? Math.round((attempt.score / attempt.totalPoints) * 100)
       : null;
   const passed = percentage != null && percentage >= 60;
@@ -50,7 +41,8 @@ function StudentResults({
               </span>
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              {attempt.totalQuestions} question{attempt.totalQuestions !== 1 ? "s" : ""}
+              {attempt.totalQuestions} question
+              {attempt.totalQuestions !== 1 ? "s" : ""}
             </p>
           </div>
 

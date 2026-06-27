@@ -1,45 +1,26 @@
 "use client";
 
-import { ArrowLeft, FileText, Users, XCircle, CheckCircle, Trophy } from "lucide-react";
+import { SessionData } from "@/lib/types";
+import {
+  ArrowLeft,
+  FileText,
+  Users,
+  XCircle,
+  CheckCircle,
+  Trophy,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
-function AttemptDetailPage({
-  session,
-}: {
-  session: {
-    id: string;
-    code: string;
-    isActive: boolean;
-    cancelled: boolean;
-    currentQuestion: number | null;
-    startedAt: Date;
-    endedAt: Date | null;
-    quizId: string;
-    quiz: {
-      id: string;
-      title: string;
-      questions: {
-        id: string;
-        text: string;
-        type: string;
-        points: number;
-        order: number;
-        options: unknown;
-        answer: string | null;
-      }[];
-    };
-    participants: {
-      id: string;
-      userId: string;
-      name: string;
-      email: string;
-      joinedAt: string;
-      score: number | null;
-    }[];
-  };
-}) {
+function AttemptDetailPage({ session }: { session: SessionData }) {
   const router = useRouter();
-  const totalPoints = session.quiz.questions.reduce((sum, q) => sum + q.points, 0);
+  const totalPoints = session.quiz.questions.reduce(
+    (sum: number, q) => sum + q.points,
+    0,
+  );
+
+  const ranked = [...session.participants].sort(
+    (a, b) => (b.score ?? 0) - (a.score ?? 0),
+  );
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6 max-w-4xl mx-auto w-full">
@@ -100,11 +81,13 @@ function AttemptDetailPage({
         {session.participants.length === 0 ? (
           <div className="p-12 text-center">
             <Users className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-            <p className="text-sm text-gray-500">No participants joined this session.</p>
+            <p className="text-sm text-gray-500">
+              No participants joined this session.
+            </p>
           </div>
         ) : (
           <div className="divide-y">
-            {session.participants.map((p, i) => (
+            {ranked.map((p, i) => (
               <div
                 key={p.id}
                 className="flex items-center justify-between px-5 py-3.5"
@@ -121,7 +104,9 @@ function AttemptDetailPage({
                       {p.name ?? "Anonymous"}
                     </p>
                     {p.email && (
-                      <p className="text-xs text-gray-500 truncate">{p.email}</p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {p.email}
+                      </p>
                     )}
                   </div>
                 </div>
