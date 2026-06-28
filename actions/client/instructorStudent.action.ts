@@ -111,7 +111,13 @@ export async function getConnectedInstructors(): Promise<ConnectedInstructor[]> 
         },
       },
     },
-  });
+  }) as unknown as {
+    instructor: {
+      id: string;
+      name: string;
+      quizzes: { id: string; title: string; description: string | null; _count: { questions: number } }[];
+    };
+  }[];
 
   return connections.map((c) => ({
     instructorId: c.instructor.id,
@@ -149,7 +155,10 @@ export async function getInstructorStudents(): Promise<ConnectedStudent[]> {
       },
     },
     orderBy: { createdAt: "desc" },
-  });
+  }) as unknown as {
+    createdAt: Date;
+    student: { id: string; name: string; email: string | null };
+  }[];
 
   return connections.map((c) => ({
     id: c.student.id,

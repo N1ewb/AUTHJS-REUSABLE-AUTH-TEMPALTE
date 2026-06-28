@@ -23,7 +23,14 @@ export async function getNotifications(): Promise<AppNotification[]> {
     where: { userId },
     orderBy: { createdAt: "desc" },
     take: 50,
-  });
+  }) as unknown as {
+    id: string;
+    title: string;
+    body: string;
+    createdAt: Date;
+    read: boolean;
+    href: string | null;
+  }[];
 
   const results: AppNotification[] = dbNotifications.map((n) => ({
     id: n.id,
@@ -121,7 +128,7 @@ export async function notifyQuizPublished(quizId: string) {
   const connections = await prisma.studentInstructor.findMany({
     where: { instructorId: quiz.instructorId },
     select: { studentId: true },
-  });
+  }) as unknown as { studentId: string }[];
 
   if (connections.length === 0) return;
 
