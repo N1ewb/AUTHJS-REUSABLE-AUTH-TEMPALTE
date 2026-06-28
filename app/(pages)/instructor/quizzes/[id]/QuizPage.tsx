@@ -1,6 +1,7 @@
 import { MessageCircleQuestion, MessageSquareText, Radio } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 import DefaultBG from "../../../../../assets/quizpage-default.png";
 import AddQuestionForm from "@/app/(components)/AddQuestionForm";
 import DeleteQuizButton from "@/app/(components)/DeleteQuizButton";
@@ -86,9 +87,15 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
               </span>
             </p>
             <div className="line w-[1px] h-full bg-gray-400"></div>
-            <p className="flex flex-col">
-              Attempt History {"/Make this modal/ text: View"}
-            </p>
+            <Link
+              href={`/instructor/quizzes/${quiz.id}/attempts`}
+              className="flex flex-col hover:text-[#56205E]/80 transition-colors"
+            >
+              Attempt History
+              <span className="flex items-center bg-[#56205E] rounded-e-lg px-5 py-1 font-semibold hover:bg-white hover:border border-[#56205E] hover:text-[#56205E] text-white">
+                View
+              </span>
+            </Link>
           </div>
           <div className="flex">
             <CopyInviteCode quizId={quiz.id} code={quiz.code} />

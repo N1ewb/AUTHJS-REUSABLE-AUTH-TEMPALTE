@@ -901,6 +901,33 @@ export async function getInstructorSessionHistory() {
   }));
 }
 
+export async function getQuizAttemptSessions(quizId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const liveSessions = await prisma.liveSession.findMany({
+    where: { quizId },
+    include: {
+      _count: { select: { attempts: true } },
+    },
+    orderBy: { startedAt: "desc" },
+  }) as unknown as Array<{
+    id: string; code: string; isActive: boolean; cancelled: boolean;
+    startedAt: Date; endedAt: Date | null;
+    _count: { attempts: number };
+  }>;
+
+  return liveSessions.map((s) => ({
+    id: s.id,
+    code: s.code,
+    isActive: s.isActive,
+    cancelled: s.cancelled,
+    startedAt: s.startedAt.toISOString(),
+    endedAt: s.endedAt?.toISOString() ?? null,
+    participantCount: s._count.attempts,
+  }));
+}
+
 export async function getStudentActiveSession() {
   const session = await auth();
   if (!session?.user?.id) return null;

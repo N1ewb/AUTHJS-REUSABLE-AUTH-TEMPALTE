@@ -81,9 +81,10 @@ export default function InstructorDashboard({
         </div>
         <div className="divide-y flex flex-col min-h-0 overflow-y-auto">
           {data.recentQuizzes.map((quiz) => (
-            <div
+            <Link
               key={quiz.id}
-              className="flex items-center justify-between px-6 py-4"
+              href={`/instructor/quizzes/${quiz.id}`}
+              className="flex items-center justify-between px-6 py-4 hover:bg-muted/50 transition-colors"
             >
               <div className="flex-1">
                 <p className="text-sm font-medium text-card-foreground">
@@ -118,7 +119,7 @@ export default function InstructorDashboard({
                   {quiz.status}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
           {data.recentQuizzes.length === 0 && (
             <div className="px-6 py-10 text-center text-sm text-muted-foreground">
