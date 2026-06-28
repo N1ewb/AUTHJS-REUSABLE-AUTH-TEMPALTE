@@ -61,7 +61,11 @@ export async function getQuizById(id: string) {
     lectureId: quiz.lectureId,
     _count: { questions: quiz._count.questions, sessions: sessionCount },
     averageScore: scoreAgg._avg.score,
-    questions: quiz.questions.map((q) => ({
+    questions: quiz.questions.map((q: {
+      id: string; text: string; type: string; points: number;
+      order: number; options: unknown; answer: string | null;
+      codeTemplate: string | null; createdAt: Date; updatedAt: Date;
+    }) => ({
       id: q.id,
       text: q.text,
       type: q.type as QuestionType,

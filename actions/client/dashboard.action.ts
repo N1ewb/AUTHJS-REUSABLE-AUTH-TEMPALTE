@@ -79,7 +79,7 @@ export async function getInstructorDashboard(): Promise<InstructorDashboardData>
     where: { quizId: { in: quizIds }, score: { not: null } },
     _avg: { score: true },
   });
-  const scoreMap = new Map(scoreAggs.map((s) => [s.quizId, s._avg.score]));
+  const scoreMap = new Map(scoreAggs.map((s: { quizId: string; _avg: { score: number | null } }) => [s.quizId, s._avg.score]));
 
   return {
     stats: {
