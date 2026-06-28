@@ -109,7 +109,14 @@ export async function getQuizzes() {
     where: { instructorId: session.user.id },
     include: { _count: { select: { questions: true } } },
     orderBy: { createdAt: "desc" },
-  });
+  }) as unknown as Array<{
+    id: string; title: string; description: string | null; type: string;
+    code: string | null; isPublished: boolean; timeLimit: number | null;
+    passingScore: number | null; maxAttempts: number; shuffleQuestions: boolean;
+    tags: unknown; createdAt: Date; updatedAt: Date; instructorId: string;
+    lectureId: string | null;
+    _count: { questions: number };
+  }>;
 
   return quizzes.map((q) => ({
     id: q.id,
@@ -453,7 +460,21 @@ export async function getLiveSession(id: string) {
         orderBy: { startedAt: "asc" },
       },
     },
-  });
+  }) as unknown as {
+    id: string; code: string; isActive: boolean; cancelled: boolean;
+    currentQuestion: number | null; startedAt: Date; endedAt: Date | null; quizId: string;
+    quiz: {
+      id: string; title: string; instructorId: string; tags: unknown;
+      questions: Array<{
+        id: string; text: string; type: QuestionType; points: number;
+        order: number; options: unknown; answer: string | null;
+      }>;
+    };
+    attempts: Array<{
+      id: string; user: { id: string; name: string; email: string };
+      startedAt: Date; score: number | null;
+    }>;
+  };
 
   if (!liveSession || liveSession.quiz.instructorId !== session.user.id)
     throw new Error("Not found");
@@ -750,7 +771,10 @@ export async function getSessionParticipants(sessionId: string) {
       user: { select: { id: true, name: true, email: true } },
     },
     orderBy: { startedAt: "asc" },
-  });
+  }) as unknown as Array<{
+    id: string; score: number | null; startedAt: Date;
+    userId: string; user: { id: string; name: string; email: string };
+  }>;
 
   return attempts.map((a) => ({
     id: a.id,
@@ -777,7 +801,10 @@ export async function getQuestionSubmissions(
         select: { response: true },
       },
     },
-  });
+  }) as unknown as Array<{
+    id: string; userId: string; user: { name: string };
+    answers: Array<{ response: unknown }>;
+  }>;
 
   return attempts.map((a) => ({
     userId: a.userId,
@@ -852,7 +879,11 @@ export async function getInstructorSessionHistory() {
     },
     orderBy: { endedAt: "desc" },
     take: 50,
-  });
+  }) as unknown as Array<{
+    id: string; code: string; isActive: boolean; cancelled: boolean;
+    startedAt: Date; endedAt: Date | null;
+    quiz: { id: string; title: string }; _count: { attempts: number };
+  }>;
 
   return liveSessions.map((s) => ({
     id: s.id,
@@ -934,7 +965,17 @@ export async function getStudentPublishedQuizzes() {
         },
       },
     },
-  });
+  }) as unknown as Array<{
+    instructor: {
+      id: string; name: string;
+      quizzes: Array<{
+        id: string; title: string; description: string | null; type: QuizType;
+        code: string | null; isPublished: boolean; timeLimit: number | null;
+        passingScore: number | null; maxAttempts: number; shuffleQuestions: boolean;
+        tags: unknown; createdAt: Date; _count: { questions: number };
+      }>;
+    };
+  }>;
 
   return connections.map((c) => ({
     instructor: { id: c.instructor.id, name: c.instructor.name },
@@ -1006,7 +1047,7 @@ export async function getRecentUnattemptedQuizzes() {
     where: { userId: session.user.id, submittedAt: { not: null } },
     select: { quizId: true },
     distinct: ["quizId"],
-  });
+  }) as unknown as Array<{ quizId: string }>;
 
   const attemptedSet = new Set(attemptedQuizIds.map((a) => a.quizId));
 

@@ -27,7 +27,16 @@ export async function getQuizByCode(code: string) {
         },
       },
     },
-  });
+  }) as unknown as {
+    id: string; title: string; description: string | null; code: string | null;
+    timeLimit: number | null; passingScore: number | null; maxAttempts: number;
+    shuffleQuestions: boolean; instructor: { id: string; name: string };
+    _count: { questions: number };
+    questions: Array<{
+      id: string; text: string; type: QuestionType; points: number;
+      order: number; options: unknown; answer: string | null;
+    }>;
+  } | null;
 
   if (!quiz) return null;
 
@@ -148,7 +157,18 @@ export async function finishStandardAttempt(attemptId: string) {
         },
       },
     },
-  });
+  }) as unknown as {
+    id: string; quizId: string;
+    answers: Array<{
+      id: string; attemptId: string; questionId: string; response: unknown;
+      createdAt: Date; updatedAt: Date; isCorrect: boolean | null; pointsAwarded: number | null;
+    }>;
+    quiz: {
+      questions: Array<{
+        id: string; type: QuestionType; points: number; options: unknown; answer: string | null;
+      }>;
+    };
+  } | null;
 
   if (!attempt) throw new Error("Attempt not found");
 
@@ -246,7 +266,14 @@ export async function getStudentQuizAttempts(quizId: string) {
         },
       },
     },
-  });
+  }) as unknown as Array<{
+    id: string; score: number | null; totalPoints: number | null;
+    startedAt: Date; submittedAt: Date | null;
+    answers: Array<{
+      id: string; questionId: string; response: unknown;
+      isCorrect: boolean | null; pointsAwarded: number | null;
+    }>;
+  }>;
 
   const quiz = await prisma.quiz.findUnique({
     where: { id: quizId },
@@ -264,7 +291,12 @@ export async function getStudentQuizAttempts(quizId: string) {
         },
       },
     },
-  });
+  }) as unknown as {
+    questions: Array<{
+      id: string; text: string; type: QuestionType; points: number;
+      order: number; options: unknown; answer: string | null;
+    }>;
+  } | null;
 
   if (!quiz) throw new Error("Quiz not found");
 
@@ -297,7 +329,7 @@ export async function getStudentQuizAttempts(quizId: string) {
           questionId: ans.questionId,
           response: parsed as { label: string; text: string } | null,
           isCorrect: ans.isCorrect,
-          pointsAwarded: ans.pointsAwarded,
+          pointsAwarded: ans.pointsAwarded ?? 0,
         };
       }),
     })),
@@ -371,7 +403,20 @@ export async function getStudentAttemptDetail(attemptId: string) {
         },
       },
     },
-  });
+  }) as unknown as {
+    id: string; score: number | null; totalPoints: number | null;
+    startedAt: Date; submittedAt: Date | null;
+    answers: Array<{
+      id: string; questionId: string; response: unknown;
+      isCorrect: boolean | null; pointsAwarded: number | null;
+    }>;
+    quiz: {
+      questions: Array<{
+        id: string; text: string; type: QuestionType; points: number;
+        order: number; options: unknown; answer: string | null;
+      }>;
+    };
+  } | null;
 
   if (!attempt) throw new Error("Attempt not found");
 
@@ -404,7 +449,7 @@ export async function getStudentAttemptDetail(attemptId: string) {
           questionId: ans.questionId,
           response: parsed as { label: string; text: string } | null,
           isCorrect: ans.isCorrect,
-          pointsAwarded: ans.pointsAwarded,
+          pointsAwarded: ans.pointsAwarded ?? 0,
         };
       }),
     },
