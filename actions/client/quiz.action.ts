@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { notifyQuizPublished, notifyQuizAttempts } from "@/actions/client/notification.action";
 import type {
@@ -175,7 +176,7 @@ export async function createQuiz(data: {
     throw new Error("Title and questions are required");
   }
 
-  const quiz = await prisma.$transaction(async (tx) => {
+  const quiz = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     return tx.quiz.create({
       data: {
         title,
@@ -548,7 +549,9 @@ export async function computeSessionScores(id: string) {
       options: true,
       answer: true,
     },
-  });
+  }) as unknown as Array<{
+    id: string; type: string; points: number; options: unknown; answer: string | null;
+  }>;
 
   const questionMap = new Map(questions.map((q) => [q.id, q]));
   let totalPoints = 0;
