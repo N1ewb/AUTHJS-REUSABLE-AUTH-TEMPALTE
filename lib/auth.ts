@@ -1,6 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import api from "./api";
+import prisma from "@/lib/db";
+import { compare } from "bcrypt";
 import { Role } from "./types";
 
 export const { signIn, signOut, auth, handlers } = NextAuth({
@@ -11,24 +12,37 @@ export const { signIn, signOut, auth, handlers } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<User | null> {
-        if (!credentials) return null;
-        const response = await api.post("/login", {
-          email: credentials.email,
-          password: credentials.password,
-        });
-        const token = await response.data.token;
+        if (!credentials?.email || !credentials?.password) return null;
 
-        if (token) {
-          return {
-            id: response.data.user.id,
-            first_name: response.data.user.first_name,
-            last_name: response.data.user.last_name,
-            email: response.data.user.email,
-            role: response.data.user.role,
-            api_token: token,
-          };
-        }
-        return null;
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            passwordHash: true,
+            theme: true,
+          },
+        });
+
+        if (!user || !user.passwordHash) return null;
+
+        const valid = await compare(
+          credentials.password as string,
+          user.passwordHash,
+        );
+        if (!valid) return null;
+
+        return {
+          id: user.id,
+          first_name: user.name,
+          last_name: "",
+          email: user.email ?? "",
+          role: user.role.toLowerCase(),
+          api_token: "",
+          theme: user.theme,
+        };
       },
     }),
   ],
