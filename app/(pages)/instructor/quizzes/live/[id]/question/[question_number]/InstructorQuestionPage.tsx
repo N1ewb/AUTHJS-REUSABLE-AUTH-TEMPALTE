@@ -51,10 +51,10 @@ function InstructorQuestionPage({
     <div className="flex flex-col flex-1 min-h-0 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Question {questionNumber} of {totalQuestions}
           </p>
-          <h2 className="text-lg font-semibold text-gray-900 mt-1">
+          <h2 className="text-lg font-semibold text-card-foreground mt-1">
             {question.text}
           </h2>
         </div>
@@ -63,7 +63,7 @@ function InstructorQuestionPage({
             <button
               disabled={isPending}
               onClick={() => goToQuestion(questionNumber - 1)}
-              className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50"
             >
               <ArrowLeft className="w-4 h-4" />
               Previous
@@ -100,12 +100,12 @@ function InstructorQuestionPage({
           {question.options.map((option) => (
             <div
               key={option.label}
-              className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card"
             >
-              <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600 shrink-0">
+              <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground shrink-0">
                 {option.label}
               </span>
-              <span className="text-sm text-gray-900">{option.text}</span>
+              <span className="text-sm text-card-foreground">{option.text}</span>
               {option.isCorrect && (
                 <span className="ml-auto text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
                   Correct
@@ -115,24 +115,24 @@ function InstructorQuestionPage({
           ))}
         </div>
       )}
-      <div className="border-t pt-4">
-        <p className="text-sm font-medium text-gray-700 mb-3">
+      <div className="border-t pt-4 flex flex-col min-h-0">
+        <p className="text-sm font-medium text-muted-foreground mb-3">
           Student Submissions
         </p>
-        <div className="space-y-2">
+        <div className="flex flex-col min-h-0 gap-2  overflow-auto">
           {submissions.map((s) => (
             <div
               key={s.userId}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted"
             >
               <span
                 className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                   s.submitted ? "bg-green-500" : "bg-red-400"
                 }`}
               />
-              <span className="text-sm text-gray-700">{s.name}</span>
+              <span className="text-sm text-muted-foreground">{s.name}</span>
               {s.submitted && s.answer && (
-                <span className="ml-auto text-xs text-gray-400">
+                <span className="ml-auto text-xs text-muted-foreground">
                   Answered: {s.answer}
                 </span>
               )}

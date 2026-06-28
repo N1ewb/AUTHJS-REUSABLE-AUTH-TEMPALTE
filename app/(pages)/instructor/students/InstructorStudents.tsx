@@ -33,32 +33,32 @@ function InstructorStudents() {
 
   return (
     <div className="flex flex-1 min-h-0 p-6 mx-auto w-full">
-      <div className="flex-1 min-w-0 mx-auto">
-        <h1 className="text-xl font-semibold text-gray-900 mb-6">Students</h1>
+      <div className="flex flex-col min-h-0 flex-1 min-w-0 mx-auto">
+        <h1 className="text-xl font-semibold text-card-foreground mb-6">Students</h1>
 
         {loading ? (
           <div className="space-y-4 animate-pulse">
-            <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between">
+            <div className="bg-card rounded-xl border border-border p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gray-200" />
+                <div className="w-10 h-10 rounded-lg bg-muted" />
                 <div className="space-y-2">
-                  <div className="h-4 w-24 bg-gray-200 rounded" />
-                  <div className="h-3 w-44 bg-gray-200 rounded" />
+                  <div className="h-4 w-24 bg-muted rounded" />
+                  <div className="h-3 w-44 bg-muted rounded" />
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="h-6 w-32 bg-gray-200 rounded" />
-                <div className="h-8 w-16 bg-gray-200 rounded-lg" />
+                <div className="h-6 w-32 bg-muted rounded" />
+                <div className="h-8 w-16 bg-muted rounded-lg" />
               </div>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-card rounded-xl border border-border p-5">
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gray-200" />
+                    <div className="w-9 h-9 rounded-full bg-muted" />
                     <div className="space-y-1.5 flex-1">
-                      <div className="h-3.5 w-32 bg-gray-200 rounded" />
-                      <div className="h-3 w-48 bg-gray-200 rounded" />
+                      <div className="h-3.5 w-32 bg-muted rounded" />
+                      <div className="h-3 w-48 bg-muted rounded" />
                     </div>
                   </div>
                 ))}
@@ -67,16 +67,16 @@ function InstructorStudents() {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between">
+            <div className="bg-card rounded-xl border border-border p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-[#56205E]/10 flex items-center justify-center">
                   <KeyRound className="w-5 h-5 text-[#56205E]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-card-foreground">
                     Invite Code
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Share this code with students to connect
                   </p>
                 </div>
@@ -101,25 +101,25 @@ function InstructorStudents() {
               </div>
             </div>
 
-            <div className="mt-6">
-              <p className="text-sm text-gray-500 mb-3">
+            <div className="flex flex-col min-h-0 mt-6">
+              <p className="text-sm text-muted-foreground mb-3">
                 {students.length} connected student
                 {students.length !== 1 ? "s" : ""}
               </p>
 
               {students.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                  <Users className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-                  <h2 className="text-sm font-medium text-gray-900 mb-1">
+                <div className="bg-card rounded-xl border border-border p-12 text-center">
+                  <Users className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                  <h2 className="text-sm font-medium text-card-foreground mb-1">
                     No connected students yet
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Students who enter your invite code will appear here.
                   </p>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl border border-gray-200">
-                  <div className="divide-y">
+                <div className="flex flex-col min-h-0 bg-card rounded-xl border border-border">
+                  <div className="divide-y flex flex-col min-h-0 overflow-y-auto">
                     {students.map((s) => (
                       <div
                         key={s.id}
@@ -129,17 +129,17 @@ function InstructorStudents() {
                           {s.name?.charAt(0)?.toUpperCase() ?? "?"}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <p className="text-sm font-medium text-card-foreground truncate">
                             {s.name}
                           </p>
                           {s.email && (
-                            <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                            <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
                               <Mail className="w-3 h-3" />
                               {s.email}
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-gray-500 shrink-0">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                           <Calendar className="w-3 h-3" />
                           {new Date(s.joinedAt).toLocaleDateString()}
                         </div>

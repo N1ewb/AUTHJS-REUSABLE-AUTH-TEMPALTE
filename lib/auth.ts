@@ -36,7 +36,7 @@ export const { signIn, signOut, auth, handlers } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session: updateSession }) {
       if (user) {
         token.id = user.id;
         token.first_name = user.first_name;
@@ -44,6 +44,20 @@ export const { signIn, signOut, auth, handlers } = NextAuth({
         token.email = user.email;
         token.role = user.role;
         token.api_token = user.api_token;
+        if (user.theme) token.theme = user.theme;
+      }
+      if (trigger === "update" && updateSession) {
+        if (updateSession.name) {
+          const parts = (updateSession.name as string).split(" ");
+          token.first_name = parts[0] ?? "";
+          token.last_name = parts.slice(1).join(" ") ?? "";
+        }
+        if (updateSession.email) {
+          token.email = updateSession.email;
+        }
+        if (updateSession.theme) {
+          token.theme = updateSession.theme;
+        }
       }
       return token;
     },
@@ -54,6 +68,8 @@ export const { signIn, signOut, auth, handlers } = NextAuth({
       session.user.last_name = token.last_name as string;
       session.user.role = token.role as Role;
       session.user.api_token = token.api_token as string;
+      session.user.name = `${token.first_name} ${token.last_name}`.trim();
+      session.user.theme = token.theme as string | undefined;
       return session;
     },
   },

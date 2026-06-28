@@ -4,7 +4,8 @@ import { LoginFormData } from "@/components/forms/LoginForm";
 import { SignupData } from "@/components/forms/StudentRegistrationForm";
 
 import prisma from "@/lib/db";
-import { hash } from "bcrypt";
+import { auth } from "@/lib/auth";
+import { hash, compare } from "bcrypt";
 import { signIn, signOut } from "@/lib/auth";
 import { Prisma, Role } from "@prisma/client";
 
@@ -63,6 +64,137 @@ export async function signUp(values: SignupData) {
       error instanceof Error ? error.message : "An error occurred during sign up";
     return { success: false, message };
   }
+}
+
+export async function updateProfile(data: {
+  name: string;
+  email: string;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  try {
+    const existing = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+    if (!existing) throw new Error("User not found");
+
+    const updateData: Record<string, string> = {};
+    if (data.name.trim()) updateData.name = data.name.trim();
+    if (data.email.trim() && data.email !== existing.email) {
+      const emailTaken = await prisma.user.findUnique({
+        where: { email: data.email.trim() },
+      });
+      if (emailTaken) {
+        return { success: false, message: "Email already in use" };
+      }
+      updateData.email = data.email.trim();
+    }
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: updateData,
+    });
+
+    return { success: true, message: "Profile updated" };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update profile";
+    return { success: false, message };
+  }
+}
+
+export async function changePassword(data: {
+  currentPassword: string;
+  newPassword: string;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { passwordHash: true },
+    });
+    if (!user || !user.passwordHash) {
+      return { success: false, message: "No password set for this account" };
+    }
+
+    const valid = await compare(data.currentPassword, user.passwordHash);
+    if (!valid) {
+      return { success: false, message: "Current password is incorrect" };
+    }
+
+    if (data.newPassword.length < 6) {
+      return {
+        success: false,
+        message: "New password must be at least 6 characters",
+      };
+    }
+
+    const hashed = await hash(data.newPassword, 10);
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { passwordHash: hashed },
+    });
+
+    return { success: true, message: "Password updated" };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to change password";
+    return { success: false, message };
+  }
+}
+
+export async function updateSettings(data: {
+  theme?: string;
+  notificationPrefs?: Record<string, boolean>;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  try {
+    const updateData: Record<string, unknown> = {};
+    if (data.theme) updateData.theme = data.theme;
+    if (data.notificationPrefs) updateData.notificationPrefs = data.notificationPrefs;
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: updateData,
+    });
+
+    return { success: true, message: "Settings saved" };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to save settings";
+    return { success: false, message };
+  }
+}
+
+export async function getSettings() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      name: true,
+      email: true,
+      image: true,
+      theme: true,
+      notificationPrefs: true,
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return {
+    name: user.name,
+    email: user.email ?? "",
+    image: user.image,
+    theme: user.theme,
+    notificationPrefs: user.notificationPrefs as Record<string, boolean> | null,
+  };
 }
 
 export async function logout() {

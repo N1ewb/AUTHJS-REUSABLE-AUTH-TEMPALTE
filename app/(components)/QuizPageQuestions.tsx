@@ -34,20 +34,20 @@ function ViewMode({
   const options = question.options as Option[] | null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-card rounded-xl border border-border p-4">
       <div className="flex items-start gap-3">
         <span className="shrink-0 w-7 h-7 rounded-lg bg-[#56205E]/10 flex items-center justify-center text-xs font-bold text-[#56205E]">
           {question.order}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-gray-900 leading-relaxed">
+          <p className="text-sm font-medium text-card-foreground leading-relaxed">
             {question.text}
           </p>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+            <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
               {typeLabels[question.type] || question.type}
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {question.points} pt{question.points !== 1 ? "s" : ""}
             </span>
           </div>
@@ -60,7 +60,7 @@ function ViewMode({
                   className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg ${
                     opt.isCorrect
                       ? "bg-green-50 text-green-800 font-medium"
-                      : "bg-gray-50 text-gray-700"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
                   <span className="text-xs font-bold w-5">{opt.label}.</span>
@@ -91,7 +91,7 @@ function ViewMode({
 
         <button
           onClick={onEdit}
-          className="shrink-0 p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+          className="shrink-0 p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-muted-foreground transition-colors"
         >
           <Pencil className="w-4 h-4" />
         </button>
@@ -172,7 +172,7 @@ function EditMode({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#56205E]/30 p-4">
+    <div className="bg-card rounded-xl border border-[#56205E]/30 p-4">
       <div className="flex items-start gap-3">
         <span className="shrink-0 w-7 h-7 rounded-lg bg-[#56205E]/10 flex items-center justify-center text-xs font-bold text-[#56205E]">
           {question.order}
@@ -181,14 +181,14 @@ function EditMode({
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full text-sm font-medium text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+            className="w-full text-sm font-medium text-card-foreground border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
           />
 
           <div className="flex items-center gap-2">
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             >
               {questionTypes.map((t) => (
                 <option key={t} value={t}>
@@ -200,9 +200,9 @@ function EditMode({
               type="number"
               value={points}
               onChange={(e) => setPoints(Number(e.target.value))}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             />
-            <span className="text-xs text-gray-400">pts</span>
+            <span className="text-xs text-muted-foreground">pts</span>
           </div>
 
           {type === "MCQ" && (
@@ -215,25 +215,25 @@ function EditMode({
                     className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       opt.isCorrect
                         ? "border-green-500 bg-green-50"
-                        : "border-gray-300"
+                        : "border-border"
                     }`}
                   >
                     {opt.isCorrect && <Check className="w-3 h-3 text-green-600" />}
                   </button>
-                  <span className="text-xs font-bold w-4 text-gray-500">
+                  <span className="text-xs font-bold w-4 text-muted-foreground">
                     {opt.label}.
                   </span>
                   <input
                     value={opt.text}
                     onChange={(e) => updateOptionText(opt.label, e.target.value)}
                     placeholder="Option text"
-                    className="flex-1 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+                    className="flex-1 text-sm border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
                   />
                   {options.length > 2 && (
                     <button
                       type="button"
                       onClick={() => removeOption(opt.label)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="text-muted-foreground hover:text-red-500 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -254,7 +254,7 @@ function EditMode({
             <select
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             >
               <option value="">Select answer</option>
               <option value="True">True</option>
@@ -267,7 +267,7 @@ function EditMode({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Correct answer"
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="w-full text-sm border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             />
           )}
 
@@ -282,7 +282,7 @@ function EditMode({
             <button
               onClick={onCancel}
               disabled={isPending}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50"
             >
               Cancel
             </button>

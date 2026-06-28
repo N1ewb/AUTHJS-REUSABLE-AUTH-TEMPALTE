@@ -32,7 +32,7 @@ export default function LandingHeader() {
 
       {/* Desktop nav */}
       <nav className="hidden md:flex items-center gap-8">
-        <Link href="/login" className="text-[#56205E]/70 hover:text-[#56205E] transition">
+        <Link href="/login" className={filledStyle}>
           Login
         </Link>
         <Link href="/studentregistration" className={btn("student")}>
@@ -61,7 +61,7 @@ export default function LandingHeader() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-white border-t shadow-lg flex flex-col items-center gap-4 py-6 md:hidden">
-          <Link href="/login" onClick={close} className="text-[#56205E]/70 hover:text-[#56205E] transition">
+          <Link href="/login" onClick={close} className={filledStyle}>
             Login
           </Link>
           <Link href="/studentregistration" onClick={close} className={btn("student")}>

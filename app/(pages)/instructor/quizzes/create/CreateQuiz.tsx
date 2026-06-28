@@ -452,8 +452,8 @@ function CreateQuiz() {
                       currentStep > step.id
                         ? "bg-[#56205E] border-[#56205E] text-white"
                         : currentStep === step.id
-                          ? "border-[#56205E] text-[#56205E] bg-white"
-                          : "border-gray-300 text-gray-400 bg-white"
+                          ? "border-[#56205E] text-[#56205E] bg-card"
+                          : "border-border text-muted-foreground bg-card"
                     }`}
                   >
                     {currentStep > step.id ? (
@@ -466,7 +466,7 @@ function CreateQuiz() {
                     className={`text-xs mt-2 font-medium text-center ${
                       currentStep >= step.id
                         ? "text-[#56205E]"
-                        : "text-gray-400"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {step.label}
@@ -475,7 +475,7 @@ function CreateQuiz() {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`flex-1 h-0.5 mx-3 mt-[-1.5rem] ${
-                      currentStep > step.id ? "bg-[#56205E]" : "bg-gray-200"
+                      currentStep > step.id ? "bg-[#56205E]" : "bg-muted"
                     }`}
                   />
                 )}
@@ -485,15 +485,15 @@ function CreateQuiz() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-xl border p-6 md:p-8 flex flex-col flex-grow min-h-0">
+        <div className="bg-card rounded-xl border p-6 md:p-8 flex flex-col flex-grow min-h-0">
           {/* Step 1: Details (Title + Tags) */}
           {currentStep === 1 && (
             <div className="flex flex-col space-y-8 min-h-0 ">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-card-foreground">
                   Quiz Details
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Give your quiz a name, description, and categorize it with
                   tags
                 </p>
@@ -501,7 +501,7 @@ function CreateQuiz() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Title <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -512,22 +512,22 @@ function CreateQuiz() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Description{" "}
-                    <span className="text-gray-400">(optional)</span>
+                    <span className="text-muted-foreground">(optional)</span>
                   </label>
                   <textarea
                     placeholder="Brief description of the quiz..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
                   />
                 </div>
               </div>
 
               <div className="border-t pt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-muted-foreground mb-3">
                   Tags <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -538,7 +538,7 @@ function CreateQuiz() {
                       className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                         selectedTags.includes(tag)
                           ? "bg-[#56205E] text-white border-[#56205E]"
-                          : "bg-white text-gray-600 border-gray-300 hover:border-[#56205E] hover:text-[#56205E]"
+                          : "bg-card text-muted-foreground border-border hover:border-[#56205E] hover:text-[#56205E]"
                       }`}
                     >
                       {tag}
@@ -591,10 +591,10 @@ function CreateQuiz() {
             <div className="space-y-6 flex-grow flex flex-col min-h-0 ">
               <div className="flex items-center justify-between  min-h-0">
                 <div className="">
-                  <h2 className=" text-xl font-semibold text-gray-900">
+                  <h2 className=" text-xl font-semibold text-card-foreground">
                     Quiz Questions
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Add questions for your quiz ({questions.length} added)
                   </p>
                 </div>
@@ -610,16 +610,16 @@ function CreateQuiz() {
               </div>
               {/* Question Form */}
               {showQuestionForm && (
-                <div className="bg-gray-50 rounded-lg border p-5 space-y-4 flex flex-col ">
+                <div className="bg-muted rounded-lg border p-5 space-y-4 flex flex-col ">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-gray-900">
+                    <h3 className="font-medium text-card-foreground">
                       {editingQuestionId ? "Edit Question" : "New Question"}
                     </h3>
 
                     <div className="flex flex-row-reverse align-middle justify-center items-center  gap-10">
                       <button
                         onClick={resetQuestionForm}
-                        className="text-sm text-red-500 hover:text-gray-700 flex flex-grow"
+                        className="text-sm text-red-500 hover:text-muted-foreground flex flex-grow"
                       >
                         Cancel
                       </button>
@@ -634,7 +634,7 @@ function CreateQuiz() {
                   </div>
 
                   <div className="flex flex-col min-h-0 ">
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                       Question Type
                     </label>
                     <div className="flex flex-wrap gap-2 min-h-0 ">
@@ -653,7 +653,7 @@ function CreateQuiz() {
                           className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                             qType === qt.value
                               ? "bg-[#56205E] text-white border-[#56205E]"
-                              : "bg-white text-gray-600 border-gray-300 hover:border-[#56205E]"
+                              : "bg-card text-muted-foreground border-border hover:border-[#56205E]"
                           }`}
                         >
                           {qt.label}
@@ -663,7 +663,7 @@ function CreateQuiz() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                       Question <span className="text-red-500">*</span>
                     </label>
                     <textarea
@@ -671,13 +671,13 @@ function CreateQuiz() {
                       value={qText}
                       onChange={(e) => setQText(e.target.value)}
                       rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
                     />
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                         Points
                       </label>
                       <Input
@@ -695,7 +695,7 @@ function CreateQuiz() {
                   {/* MCQ Options */}
                   {qType === "MCQ" && (
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-muted-foreground">
                         Answer Options <span className="text-red-500">*</span>
                       </label>
                       {qOptions.map((option, index) => (
@@ -705,7 +705,7 @@ function CreateQuiz() {
                             className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${
                               option.isCorrect
                                 ? "bg-green-500 text-white border-green-500"
-                                : "bg-white text-gray-500 border-gray-300 hover:border-[#56205E]"
+                                : "bg-card text-muted-foreground border-border hover:border-[#56205E]"
                             }`}
                             title="Mark as correct answer"
                           >
@@ -726,7 +726,7 @@ function CreateQuiz() {
                           {qOptions.length > 2 && (
                             <button
                               onClick={() => removeOption(index)}
-                              className="text-gray-400 hover:text-red-500"
+                              className="text-muted-foreground hover:text-red-500"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -750,7 +750,7 @@ function CreateQuiz() {
                   {/* Identification / True-False Answer */}
                   {(qType === "IDENTIFICATION" || qType === "TRUE_FALSE") && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                         Correct Answer <span className="text-red-500">*</span>
                       </label>
                       {qType === "TRUE_FALSE" ? (
@@ -760,7 +760,7 @@ function CreateQuiz() {
                             className={`px-4 py-2 rounded-lg text-sm font-medium border ${
                               qAnswer === "true"
                                 ? "bg-green-500 text-white border-green-500"
-                                : "bg-white text-gray-600 border-gray-300 hover:border-green-500"
+                                : "bg-card text-muted-foreground border-border hover:border-green-500"
                             }`}
                           >
                             True
@@ -770,7 +770,7 @@ function CreateQuiz() {
                             className={`px-4 py-2 rounded-lg text-sm font-medium border ${
                               qAnswer === "false"
                                 ? "bg-red-500 text-white border-red-500"
-                                : "bg-white text-gray-600 border-gray-300 hover:border-red-500"
+                                : "bg-card text-muted-foreground border-border hover:border-red-500"
                             }`}
                           >
                             False
@@ -788,7 +788,7 @@ function CreateQuiz() {
                   )}
 
                   {qType === "CODING" && (
-                    <div className="text-sm text-gray-500 italic">
+                    <div className="text-sm text-muted-foreground italic">
                       Coding question editor coming soon
                     </div>
                   )}
@@ -801,17 +801,17 @@ function CreateQuiz() {
                   {questions.map((q, index) => (
                     <div
                       key={q.id}
-                      className="flex items-start gap-3 p-4 bg-white border rounded-lg hover:border-[#56205E]/30 transition-colors"
+                      className="flex items-start gap-3 p-4 bg-card border rounded-lg hover:border-[#56205E]/30 transition-colors"
                     >
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#56205E]/10 text-[#56205E] text-sm font-semibold shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                          <span className="text-xs font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
                             {q.type}
                           </span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {q.points} pt{q.points > 1 ? "s" : ""}
                           </span>
                           {q.type === "MCQ" && canMarkCorrect(q) && (
@@ -820,7 +820,7 @@ function CreateQuiz() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-900 line-clamp-2">
+                        <p className="text-sm text-card-foreground line-clamp-2">
                           {q.text}
                         </p>
                         {q.type === "MCQ" && q.options.some((o) => o.text) && (
@@ -833,7 +833,7 @@ function CreateQuiz() {
                                   className={`text-xs px-2 py-0.5 rounded border ${
                                     opt.isCorrect
                                       ? "bg-green-50 text-green-700 border-green-200"
-                                      : "bg-gray-50 text-gray-500 border-gray-200"
+                                      : "bg-muted text-muted-foreground border-border"
                                   }`}
                                 >
                                   {opt.label}. {opt.text}
@@ -845,7 +845,7 @@ function CreateQuiz() {
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => editQuestion(q)}
-                          className="p-1.5 text-gray-400 hover:text-[#56205E] rounded hover:bg-gray-100"
+                          className="p-1.5 text-muted-foreground hover:text-[#56205E] rounded hover:bg-accent"
                           title="Edit"
                         >
                           <svg
@@ -864,7 +864,7 @@ function CreateQuiz() {
                         </button>
                         <button
                           onClick={() => deleteQuestion(q.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-100"
+                          className="p-1.5 text-muted-foreground hover:text-red-500 rounded hover:bg-accent"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -881,23 +881,23 @@ function CreateQuiz() {
           {currentStep === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-card-foreground">
                   Quiz Settings
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Configure how the quiz behaves
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Quiz Type
                   </label>
                   <select
                     value={quizType}
                     onChange={(e) => setQuizType(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent"
                   >
                     {QUIZ_TYPES.map((qt) => (
                       <option key={qt.value} value={qt.value}>
@@ -908,7 +908,7 @@ function CreateQuiz() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Time Limit (minutes) <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -922,7 +922,7 @@ function CreateQuiz() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Passing Score (%) <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -942,7 +942,7 @@ function CreateQuiz() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                     Max Attempts <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -962,13 +962,13 @@ function CreateQuiz() {
                     type="checkbox"
                     checked={shuffleQuestions}
                     onChange={(e) => setShuffleQuestions(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-[#56205E] focus:ring-[#56205E]"
+                    className="w-4 h-4 rounded border-border text-[#56205E] focus:ring-[#56205E]"
                   />
                   <div>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-muted-foreground">
                       Shuffle Questions
                     </span>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Randomize the order of questions for each attempt
                     </p>
                   </div>
@@ -981,31 +981,31 @@ function CreateQuiz() {
           {currentStep === 4 && (
             <div className="space-y-6 min-h-0 overflow-auto">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-card-foreground">
                   Review & Publish
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Review your quiz details before publishing
                 </p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg border divide-y">
+              <div className="bg-muted rounded-lg border divide-y">
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Title</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Title</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {title}
                   </span>
                 </div>
                 {description && (
                   <div className="p-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Description</span>
-                    <span className="text-sm text-gray-900 max-w-xs text-right line-clamp-2">
+                    <span className="text-sm text-muted-foreground">Description</span>
+                    <span className="text-sm text-card-foreground max-w-xs text-right line-clamp-2">
                       {description}
                     </span>
                   </div>
                 )}
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Tags</span>
+                  <span className="text-sm text-muted-foreground">Tags</span>
                   <div className="flex flex-wrap gap-1 justify-end">
                     {selectedTags.map((tag) => (
                       <span
@@ -1018,47 +1018,47 @@ function CreateQuiz() {
                   </div>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Questions</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Questions</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {questions.length} questions
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Total Points</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Total Points</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {questions.reduce((sum, q) => sum + q.points, 0)} pts
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Quiz Type</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Quiz Type</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {QUIZ_TYPES.find((qt) => qt.value === quizType)?.label}
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Time Limit</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Time Limit</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {timeLimit} minutes
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Passing Score</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Passing Score</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {passingScore}%
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Max Attempts</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm text-muted-foreground">Max Attempts</span>
+                  <span className="text-sm font-medium text-card-foreground">
                     {maxAttempts}
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     Shuffle Questions
                   </span>
                   <span
-                    className={`text-sm font-medium ${shuffleQuestions ? "text-green-600" : "text-gray-400"}`}
+                    className={`text-sm font-medium ${shuffleQuestions ? "text-green-600" : "text-muted-foreground"}`}
                   >
                     {shuffleQuestions ? "Yes" : "No"}
                   </span>
@@ -1135,15 +1135,15 @@ function CreateQuiz() {
       </button>
 
       {pasteOpen && (
-        <div className="fixed right-0 top-0 h-full w-80 bg-white border-l shadow-lg z-30 pt-20 flex flex-col">
+        <div className="fixed right-0 top-0 h-full w-80 bg-card border-l shadow-lg z-30 pt-20 flex flex-col">
           <div className="px-4 py-3 border-b">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900 text-sm">
+              <h3 className="font-semibold text-card-foreground text-sm">
                 Quick Paste
               </h3>
               <button
                 onClick={() => setPasteOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 <svg
                   className="w-4 h-4"
@@ -1160,7 +1160,7 @@ function CreateQuiz() {
                 </svg>
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
               Supports <span className="font-mono text-[#56205E]">A.</span>{" "}
               <span className="font-mono text-[#56205E]">A)</span>{" "}
               <span className="font-mono text-[#56205E]">1.</span>{" "}
@@ -1175,7 +1175,7 @@ function CreateQuiz() {
               placeholder={`Paste question here...\ne.g. What is Java?\nA. A language\nB. A coffee\nC. An island\nD. A framework`}
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
-              className="flex-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
+              className="flex-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
             />
             <Button
               onClick={parsePaste}

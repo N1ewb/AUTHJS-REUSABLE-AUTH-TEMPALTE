@@ -46,14 +46,14 @@ function AttemptsHistory({
 
   if (sessions.length === 0) {
     return (
-      <div className="bg-white rounded-xl border p-12 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-          <FileText className="w-8 h-8 text-gray-400" />
+      <div className="bg-card rounded-xl border p-12 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <FileText className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+        <h2 className="text-lg font-semibold text-card-foreground mb-2">
           No sessions yet
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Conduct a live quiz to see its history here.
         </p>
       </div>
@@ -63,10 +63,10 @@ function AttemptsHistory({
   return (
     <div className="flex flex-col min-h-0">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-lg font-semibold text-card-foreground">
           Attempts History
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {filteredSessions.length} of {sessions.length} session
           {sessions.length !== 1 ? "s" : ""} conducted
         </p>
@@ -74,13 +74,13 @@ function AttemptsHistory({
 
       <div className="flex items-center gap-3 mb-4 flex-wrap justify-between">
         <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by quiz title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
           />
         </div>
 
@@ -88,7 +88,7 @@ function AttemptsHistory({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+            className="text-sm border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
           >
             <option value="all">All Sessions</option>
             <option value="completed">Completed</option>
@@ -99,7 +99,7 @@ function AttemptsHistory({
             onClick={() =>
               setSortOrder((prev) => (prev === "newest" ? "oldest" : "newest"))
             }
-            className="flex items-center gap-1.5 text-sm border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 text-sm border border-border rounded-lg px-3 py-2 hover:bg-muted transition-colors"
           >
             <ArrowUpDown className="w-3.5 h-3.5" />
             {sortOrder === "newest" ? "Newest" : "Oldest"}
@@ -108,8 +108,8 @@ function AttemptsHistory({
       </div>
 
       {filteredSessions.length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="bg-card rounded-xl border p-12 text-center">
+          <p className="text-sm text-muted-foreground">
             No sessions match your filters.
           </p>
         </div>
@@ -119,7 +119,7 @@ function AttemptsHistory({
             <Link
               key={s.id}
               href={`/instructor/quizzes/attempts/${s.id}`}
-              className="block bg-white rounded-xl border p-4 hover:border-[#56205E]/40 hover:shadow-sm transition-all"
+              className="block bg-card rounded-xl border p-4 hover:border-[#56205E]/40 hover:shadow-sm transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 min-w-0">
@@ -127,14 +127,14 @@ function AttemptsHistory({
                     <FileText className="w-5 h-5 text-[#56205E]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
+                    <p className="font-medium text-card-foreground truncate">
                       {s.quizTitle}
                     </p>
                     <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(s.startedAt).toLocaleDateString()}
                       </span>
-                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Users className="w-3 h-3" />
                         {s.participantCount}
                       </span>

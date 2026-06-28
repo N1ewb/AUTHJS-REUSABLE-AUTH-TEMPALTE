@@ -1,6 +1,9 @@
 "use client";
 
-import { getStudentActiveSession } from "@/actions/client/quiz.action";
+import {
+  getStudentActiveSession,
+  getRecentUnattemptedQuizzes,
+} from "@/actions/client/quiz.action";
 import {
   getConnectedInstructors,
   linkStudentToInstructor,
@@ -19,6 +22,9 @@ import {
   ChevronRight,
   BookOpen,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import QuizCard from "@/app/(components)/QuizCard";
+import type { QuizData } from "@/lib/types";
 
 function StudentDashboard() {
   const router = useRouter();
@@ -38,12 +44,18 @@ function StudentDashboard() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [instructors, setInstructors] = useState<ConnectedInstructor[]>([]);
+  const [recentQuizzes, setRecentQuizzes] = useState<QuizData[]>([]);
 
   useEffect(() => {
-    Promise.all([getStudentActiveSession(), getConnectedInstructors()])
-      .then(([session, instructors]) => {
+    Promise.all([
+      getStudentActiveSession(),
+      getConnectedInstructors(),
+      getRecentUnattemptedQuizzes(),
+    ])
+      .then(([session, instructors, quizzes]) => {
         setActiveSession(session);
         setInstructors(instructors);
+        setRecentQuizzes(quizzes);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -89,8 +101,26 @@ function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center flex-1 min-h-0">
-        <Loader2 className="w-6 h-6 animate-spin text-[#56205E]" />
+      <div className="flex flex-1 min-h-0 p-6 mx-auto w-full">
+        <div className="flex flex-col flex-1 gap-6 min-h-0">
+          <div>
+            <Skeleton className="w-48 h-8 mb-2" />
+            <Skeleton className="w-72 h-4" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="w-full h-36 rounded-xl" />
+              <Skeleton className="w-full h-40 rounded-xl" />
+              <Skeleton className="w-full h-40 rounded-xl" />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="w-full h-40 rounded-xl" />
+              <Skeleton className="w-48 h-5" />
+              <Skeleton className="w-full h-20 rounded-xl" />
+              <Skeleton className="w-full h-20 rounded-xl" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -100,15 +130,15 @@ function StudentDashboard() {
       <div className="flex flex-col flex-1 gap-6 min-h-0">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-semibold text-card-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Join live quizzes and browse your instructors&apos; quizzes.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
           {/* Left column — join + connect */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 flex flex-col gap-6 min-h-0 overflow-y-auto">
             {/* Active session banner */}
             {activeSession && (
               <div className="p-5 rounded-xl border-2 border-[#56205E]/20 bg-gradient-to-r from-[#56205E]/5 to-transparent">
@@ -117,10 +147,10 @@ function StudentDashboard() {
                     <ArrowLeftToLine className="w-6 h-6 text-[#56205E]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-card-foreground">
                       Active Session
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       You have an ongoing quiz &mdash; code:{" "}
                       {activeSession.code}
                     </p>
@@ -141,16 +171,16 @@ function StudentDashboard() {
             )}
 
             {/* Join live quiz */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-[#56205E]/10 flex items-center justify-center">
                   <Radio className="w-5 h-5 text-[#56205E]" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900">
+                  <h2 className="text-base font-semibold text-card-foreground">
                     Join a Live Quiz
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Enter the session code from your instructor
                   </p>
                 </div>
@@ -164,7 +194,7 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleJoin()}
                   placeholder="Session code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
+                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
                   maxLength={6}
                 />
                 <button
@@ -180,16 +210,16 @@ function StudentDashboard() {
             </div>
 
             {/* Take quiz via code */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900">
+                  <h2 className="text-base font-semibold text-card-foreground">
                     Take a Quiz
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Enter a quiz code from your instructor
                   </p>
                 </div>
@@ -203,7 +233,7 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleTakeQuiz()}
                   placeholder="Quiz code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 uppercase"
+                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 uppercase"
                   maxLength={6}
                 />
                 <button
@@ -219,21 +249,46 @@ function StudentDashboard() {
                 <p className="text-xs text-red-500 mt-1.5">{quizError}</p>
               )}
             </div>
+            <div className="flex flex-col flex-1 ">
+              {recentQuizzes.length > 0 && (
+                <div>
+                  <h2 className="text-base font-semibold text-card-foreground mb-3">
+                    Recent Quizzes
+                  </h2>
+                  <div
+                    className="flex flex-row-reverse gap-4 overflow-x-auto pb-2 scroll-smooth"
+                    onWheel={(e) => {
+                      if (e.deltaY !== 0) {
+                        e.currentTarget.scrollLeft += e.deltaY * 4;
+                      }
+                    }}
+                  >
+                    {recentQuizzes.map((quiz) => (
+                      <QuizCard
+                        key={quiz.id}
+                        quiz={quiz}
+                        href={`/student/quizzes/standard/${quiz.code}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right column — connected instructors */}
           <div className="flex flex-col gap-5 min-h-0">
             {/* Connect with instructor */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-[#56205E]/10 flex items-center justify-center">
                   <KeyRound className="w-5 h-5 text-[#56205E]" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900">
+                  <h2 className="text-base font-semibold text-card-foreground">
                     Connect with Instructor
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Enter their invite code to see their quizzes
                   </p>
                 </div>
@@ -248,7 +303,7 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleLinkInstructor()}
                   placeholder="Invite code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.15em] border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
+                  className="flex-1 text-center text-lg font-mono tracking-[0.15em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
                   maxLength={8}
                 />
                 <button
@@ -274,31 +329,31 @@ function StudentDashboard() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-gray-400" />
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+              <GraduationCap className="w-5 h-5 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                 Your Instructors
               </h2>
             </div>
 
             {instructors.length === 0 ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+              <div className="bg-card rounded-xl border border-border p-8 text-center">
                 <GraduationCap className="w-8 h-8 mx-auto text-gray-300 mb-2" />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Connect with an instructor to see their quizzes.
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col min-h-0 overflow-auto gap-2">
+              <div className="flex flex-col min-h-0 overflow-y-auto gap-2">
                 {instructors.map((inst) => (
                   <div
                     key={inst.instructorId}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                    className="bg-card rounded-xl border border-border overflow-hidden"
                   >
-                    <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                       <div className="w-8 h-8 rounded-full bg-[#56205E]/10 flex items-center justify-center text-sm font-medium text-[#56205E]">
                         {inst.instructorName?.charAt(0)?.toUpperCase() ?? "?"}
                       </div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-card-foreground">
                         {inst.instructorName}
                       </p>
                     </div>

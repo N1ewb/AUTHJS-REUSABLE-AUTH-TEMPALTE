@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function QuizCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border p-1 h-full flex flex-col">
+    <div className="bg-card rounded-xl border p-1 h-full flex flex-col">
       <Skeleton className="w-full aspect-[2/1] rounded-lg" />
 
       <div className="p-4 flex flex-col gap-3 flex-1">

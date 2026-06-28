@@ -17,7 +17,7 @@ export type QuizData = {
   maxAttempts: number;
   shuffleQuestions: boolean;
   createdAt: string;
-  tags: unknown;
+  tags?: unknown;
   _count: { questions: number; sessions: number };
   averageScore: number | null;
   questions: QuizQuestion[];
@@ -51,7 +51,9 @@ export type SessionData = {
   quiz: {
     id: string;
     title: string;
+    description?: string;
     questions: QuizQuestion[];
+  tags?: unknown;
   };
   participants: Participant[];
 };

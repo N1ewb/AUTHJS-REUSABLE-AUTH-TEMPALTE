@@ -71,10 +71,10 @@ function StudentLiveSession({ code }: { code: string }) {
             <XCircle className="w-7 h-7 text-red-500" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-card-foreground">
               Session Cancelled
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {session?.quiz.title ?? "Quiz"} has been cancelled by the instructor.
             </p>
           </div>
@@ -97,10 +97,10 @@ function StudentLiveSession({ code }: { code: string }) {
             <Loader2 className="w-7 h-7 text-[#56205E] animate-spin" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-card-foreground">
               Joining session...
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Please wait while we connect you.
             </p>
           </div>
@@ -117,22 +117,22 @@ function StudentLiveSession({ code }: { code: string }) {
         </div>
 
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-card-foreground">
             {session.quiz.title}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {session.quiz._count.questions} questions
           </p>
         </div>
 
         <div className="flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             Waiting for the instructor to start the quiz...
           </span>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm text-gray-600">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-sm text-muted-foreground">
           <Users className="w-4 h-4" />
           {participants.length || session.participantCount} participant
           {(participants.length || session.participantCount) !== 1

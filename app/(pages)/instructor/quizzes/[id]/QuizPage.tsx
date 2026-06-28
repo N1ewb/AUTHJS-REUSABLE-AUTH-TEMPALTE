@@ -16,11 +16,11 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <div className="flex justify-between rounded-2xl border border-gray-200 w-full p-6 ">
+      <div className="flex justify-between rounded-2xl border border-border w-full p-6 ">
         <div className="flex flex-col justify-between flex-grow">
           <div className="flex gap-2 items-center">
             <p className="flex items-center gap-1 text-[12px]">
-              <Radio className="bg-gray-300 text-gray-700 p-1 rounded-full" />
+              <Radio className="bg-muted-foreground/30 text-muted-foreground p-1 rounded-full" />
               <span>{isLive ? "Live" : "Standard"}</span>
             </p>
             <PublishToggle quizId={quiz.id} isPublished={quiz.isPublished} />
@@ -37,14 +37,14 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             <p className="text-[12px]">{quiz.description}</p>
             {tags.length > 0 && (
               <div className="flex">
-                <p className="text-gray-600 bg-gray-200 text-[10px] text-center rounded-full px-3">
+                <p className="text-muted-foreground bg-muted text-[10px] text-center rounded-full px-3">
                   {tags.join(", ")}
                 </p>
               </div>
             )}
           </div>
 
-          <div className="flex text-[12px] items-center gap-3 text-gray-600">
+          <div className="flex text-[12px] items-center gap-3 text-muted-foreground">
             <p className="flex items-center gap-2">
               <MessageSquareText
                 className="p-1 rounded-md bg-[#56205E]"
@@ -54,7 +54,7 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             </p>
             <p className="text-lg">·</p>
             <p className="flex gap-2 items-center">
-              <MessageCircleQuestion className="p-1 text-gray-500" />
+              <MessageCircleQuestion className="p-1 text-muted-foreground" />
               <span>{quiz._count.questions} Questions</span>
             </p>
             <p className="text-lg">·</p>
@@ -101,7 +101,7 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
 
       <div className="mt-8 overflow-y-auto flex flex-col flex-grow min-h-0">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-card-foreground">
             Questions ({quiz._count.questions})
           </h2>
           <AddQuestionForm quizId={quiz.id} />
@@ -114,7 +114,7 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400 text-center py-8">
+          <p className="text-sm text-muted-foreground text-center py-8">
             No questions yet. Click &quot;Add Question&quot; to get started.
           </p>
         )}

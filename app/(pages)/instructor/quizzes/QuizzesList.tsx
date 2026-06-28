@@ -76,14 +76,14 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
 
   if (quizzes.length === 0) {
     return (
-      <div className="bg-white rounded-xl border p-12 text-center">
+      <div className="bg-card rounded-xl border p-12 text-center">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#56205E]/10 flex items-center justify-center">
           <Plus className="w-8 h-8 text-[#56205E]" />
         </div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+        <h2 className="text-lg font-semibold text-card-foreground mb-2">
           No quizzes yet
         </h2>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-muted-foreground mb-6">
           Create your first quiz to get started
         </p>
         <Link
@@ -101,8 +101,10 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
     <div className="flex flex-col min-w-0">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">My Quizzes</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl font-semibold text-card-foreground">
+            My Quizzes
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {filteredQuizzes.length} of {quizzes.length} quiz
             {quizzes.length !== 1 ? "zes" : ""}
           </p>
@@ -118,13 +120,13 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
 
       <div className="flex items-center justify-between mb-4 flex-wrap">
         <div className="relative flex flex-grow flex-1 min-w-[200px] max-w-xs ">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search quizzes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
           />
         </div>
         <div className="flex flex-row basis-1/3 justify-between items-start">
@@ -132,7 +134,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+            className="text-sm border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E] text-black "
           >
             <option value="all">All Status</option>
             <option value="published">Published</option>
@@ -142,7 +144,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+              className="text-sm border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E] text-black "
             >
               <option value="all">All Types</option>
               {allTypes.map((t) => (
@@ -156,7 +158,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
             <select
               value={tagFilter}
               onChange={(e) => setTagFilter(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
+              className="text-sm border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E] text-black "
             >
               <option value="all">All Tags</option>
               {allTags.map((t) => (
@@ -170,7 +172,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
             onClick={() =>
               setSortOrder((prev) => (prev === "newest" ? "oldest" : "newest"))
             }
-            className="flex items-center gap-1.5 text-sm border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 text-sm border border-border rounded-lg px-3 py-2 hover:bg-muted transition-colors"
           >
             <ArrowUpDown className="w-3.5 h-3.5" />
             {sortOrder === "newest" ? "Newest" : "Oldest"}
@@ -179,8 +181,8 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
       </div>
 
       {filteredQuizzes.length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="bg-card rounded-xl border p-12 text-center">
+          <p className="text-sm text-muted-foreground">
             No quizzes match your filters.
           </p>
         </div>
@@ -189,7 +191,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
           className="flex overflow-x-auto min-w-0 gap-4 scroll-smooth"
           onWheel={(e) => {
             if (e.deltaY !== 0) {
-              e.currentTarget.scrollLeft += e.deltaY;
+              e.currentTarget.scrollLeft += e.deltaY * 4;
             }
           }}
         >

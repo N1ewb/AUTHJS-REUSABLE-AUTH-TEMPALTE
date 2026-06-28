@@ -16,10 +16,10 @@ function QuizCard({ quiz, href }: { quiz: QuizData; href?: string }) {
 
   return (
     <Link
-      className="flex min-w-[400px] max-w-[400px]"
+      className="flex min-w-[480px] max-w-[480px]"
       href={href ?? `/instructor/quizzes/${quiz.id}`}
     >
-      <div className="bg-white rounded-xl border p-1 hover:border-[#56205E]/40 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
+      <div className="bg-card rounded-xl border p-1 hover:border-[#56205E]/40 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
         <Image src={QuizDefaultBg} alt={"Default BG"} className="rounded-lg" />
 
         <div className="p-4">
@@ -28,7 +28,7 @@ function QuizCard({ quiz, href }: { quiz: QuizData; href?: string }) {
               <div className="w-9 h-9 rounded-lg bg-[#56205E]/10 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4 text-[#56205E]" />
               </div>
-              <h3 className="font-semibold text-gray-900 truncate">
+              <h3 className="font-semibold text-card-foreground truncate">
                 {quiz.title}
               </h3>
             </div>
@@ -44,17 +44,17 @@ function QuizCard({ quiz, href }: { quiz: QuizData; href?: string }) {
           </div>
 
           {quiz.description && (
-            <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
               {quiz.description}
             </p>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
             <span className="flex items-center gap-1">
               <FileText className="w-3.5 h-3.5" />
               {quiz._count.questions} questions
             </span>
-            <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">
+            <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">
               {typeLabels[quiz.type] || quiz.type}
             </span>
             {quiz.isPublished && quiz.code && (

@@ -14,7 +14,7 @@ export default async function ResultsPage({
   } catch {
     return (
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 p-6 text-center">
-        <p className="text-sm text-gray-500">No results available for this session.</p>
+        <p className="text-sm text-muted-foreground">No results available for this session.</p>
       </div>
     );
   }

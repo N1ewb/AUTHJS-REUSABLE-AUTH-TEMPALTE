@@ -115,14 +115,14 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Question text"
-            className="w-full text-sm font-medium text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+            className="w-full text-sm font-medium text-card-foreground border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
           />
 
           <div className="flex items-center gap-2">
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             >
               {questionTypes.map((t) => (
                 <option key={t} value={t}>
@@ -134,9 +134,9 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
               type="number"
               value={points}
               onChange={(e) => setPoints(Number(e.target.value))}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             />
-            <span className="text-xs text-gray-400">pts</span>
+            <span className="text-xs text-muted-foreground">pts</span>
           </div>
 
           {type === "MCQ" && (
@@ -149,14 +149,14 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
                     className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       opt.isCorrect
                         ? "border-green-500 bg-green-50"
-                        : "border-gray-300"
+                        : "border-border"
                     }`}
                   >
                     {opt.isCorrect && (
                       <Check className="w-3 h-3 text-green-600" />
                     )}
                   </button>
-                  <span className="text-xs font-bold w-4 text-gray-500">
+                  <span className="text-xs font-bold w-4 text-muted-foreground">
                     {opt.label}.
                   </span>
                   <input
@@ -165,13 +165,13 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
                       updateOptionText(opt.label, e.target.value)
                     }
                     placeholder="Option text"
-                    className="flex-1 text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+                    className="flex-1 text-sm border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
                   />
                   {options.length > 2 && (
                     <button
                       type="button"
                       onClick={() => removeOption(opt.label)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      className="text-muted-foreground hover:text-red-500 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -192,7 +192,7 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
             <select
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="text-xs border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             >
               <option value="">Select answer</option>
               <option value="True">True</option>
@@ -205,7 +205,7 @@ function AddQuestionForm({ quizId }: { quizId: string }) {
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Correct answer"
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
+              className="w-full text-sm border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#56205E]"
             />
           )}
 

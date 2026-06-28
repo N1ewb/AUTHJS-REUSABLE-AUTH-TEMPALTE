@@ -28,20 +28,23 @@ enum QuestionType {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String?  @unique
-  passwordHash String?
-  name         String
-  role         Role     @default(STUDENT)
-  image        String?
-  inviteCode   String?  @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  email              String?  @unique
+  passwordHash       String?
+  name               String
+  role               Role     @default(STUDENT)
+  image              String?
+  inviteCode         String?  @unique
+  theme              String   @default("light")
+  notificationPrefs  Json     @default("{\"quizPublished\":true,\"attempts\":true,\"studentConnected\":true}")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   quizzes            Quiz[]
   attempts           QuizAttempt[]
   studentConnections StudentInstructor[] @relation("StudentConnections")
   instructorFor      StudentInstructor[] @relation("InstructorFor")
+  notifications      Notification[]
 }
 
 model StudentInstructor {
@@ -153,4 +156,16 @@ model Lecture {
   createdAt DateTime @default(now())
 
   quizzes Quiz[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

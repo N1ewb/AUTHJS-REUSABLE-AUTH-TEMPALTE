@@ -9,10 +9,10 @@ export default function Register() {
       <div className="flex-1 flex items-center justify-center px-8 py-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-card-foreground mb-2">
               Join as a Student
             </h1>
-            <p className="text-gray-500">
+            <p className="text-muted-foreground">
               Create your account and start learning today.
             </p>
           </div>

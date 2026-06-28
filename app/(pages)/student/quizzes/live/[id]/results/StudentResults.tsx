@@ -26,21 +26,21 @@ function StudentResults({ attempt }: { attempt: StudentAttempt }) {
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-card-foreground">
             {passed ? "Great job!" : "Keep practicing"}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">{attempt.quizTitle}</p>
+          <p className="text-sm text-muted-foreground mt-1">{attempt.quizTitle}</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div className="bg-card rounded-xl border border-border p-6 space-y-4">
           <div className="text-center">
-            <p className="text-4xl font-bold text-gray-900">
+            <p className="text-4xl font-bold text-card-foreground">
               {attempt.score ?? 0}
-              <span className="text-lg text-gray-400 font-normal">
+              <span className="text-lg text-muted-foreground font-normal">
                 /{attempt.totalPoints ?? 0}
               </span>
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {attempt.totalQuestions} question
               {attempt.totalQuestions !== 1 ? "s" : ""}
             </p>

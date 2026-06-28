@@ -11,7 +11,7 @@ export default function LiveSessionLoading() {
           <Skeleton className="h-4 w-24 mx-auto" />
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 space-y-6">
+        <div className="bg-card rounded-2xl border border-border p-8 space-y-6">
           <div className="space-y-2">
             <Skeleton className="h-4 w-24 mx-auto" />
             <Skeleton className="h-14 w-48 mx-auto" />

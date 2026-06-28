@@ -2,7 +2,9 @@
 
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { notifyQuizPublished, notifyQuizAttempts } from "@/actions/client/notification.action";
 import type {
+  QuizData,
   QuizQuestion,
   QuizQuestionOption,
   QuizType,
@@ -312,11 +314,17 @@ export async function toggleQuizPublish(id: string) {
 
   if (!quiz) throw new Error("Quiz not found");
 
+  const wasPublished = quiz.isPublished;
+
   const updated = await prisma.quiz.update({
     where: { id },
-    data: { isPublished: !quiz.isPublished },
+    data: { isPublished: !wasPublished },
     select: { isPublished: true },
   });
+
+  if (!wasPublished && updated.isPublished) {
+    await notifyQuizPublished(id).catch((e) => console.error("notifyQuizPublished failed", e));
+  }
 
   return updated.isPublished;
 }
@@ -419,6 +427,7 @@ export async function getLiveSession(id: string) {
           id: true,
           title: true,
           instructorId: true,
+          tags: true,
           questions: {
             select: {
               id: true,
@@ -492,6 +501,12 @@ export async function cancelLiveSession(id: string) {
 }
 
 export async function computeSessionScores(id: string) {
+  const session = await prisma.liveSession.findUnique({
+    where: { id },
+    select: { quizId: true },
+  });
+  if (!session) throw new Error("Session not found");
+
   const attempts = await prisma.quizAttempt.findMany({
     where: { sessionId: id },
     include: {
@@ -563,6 +578,8 @@ export async function computeSessionScores(id: string) {
       data: { score, totalPoints, submittedAt: new Date() },
     });
   }
+
+  await notifyQuizAttempts(session.quizId).catch((e) => console.error("notifyQuizAttempts failed", e));
 }
 
 export async function endLiveSession(id: string) {
@@ -878,5 +895,143 @@ export async function getStudentActiveSession() {
     currentQuestion: attempt.session.currentQuestion ?? 1,
     quizId: attempt.session.quizId,
   };
+}
+
+export async function getStudentPublishedQuizzes() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const connections = await prisma.studentInstructor.findMany({
+    where: { studentId: session.user.id },
+    select: {
+      instructor: {
+        select: {
+          id: true,
+          name: true,
+          quizzes: {
+            where: { isPublished: true, type: "PREMADE" },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              type: true,
+              code: true,
+              isPublished: true,
+              timeLimit: true,
+              passingScore: true,
+              maxAttempts: true,
+              shuffleQuestions: true,
+              tags: true,
+              createdAt: true,
+              _count: { select: { questions: true } },
+            },
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      },
+    },
+  });
+
+  return connections.map((c) => ({
+    instructor: { id: c.instructor.id, name: c.instructor.name },
+    quizzes: c.instructor.quizzes.map((q) => ({
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      type: q.type as QuizType,
+      code: q.code,
+      isPublished: q.isPublished,
+      activeSessionId: null as string | null,
+      timeLimit: q.timeLimit,
+      passingScore: q.passingScore,
+      maxAttempts: q.maxAttempts,
+      shuffleQuestions: q.shuffleQuestions,
+      tags: q.tags as unknown,
+      createdAt: q.createdAt.toISOString(),
+      _count: { questions: q._count.questions, sessions: 0 },
+      averageScore: null as number | null,
+      questions: [] as QuizQuestion[],
+    })),
+  }));
+}
+
+export async function getRecentUnattemptedQuizzes() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+  const connections = await prisma.studentInstructor.findMany({
+    where: { studentId: session.user.id },
+    select: {
+      instructor: {
+        select: {
+          id: true,
+          name: true,
+          quizzes: {
+            where: {
+              isPublished: true,
+              type: "PREMADE",
+              createdAt: { gte: twoDaysAgo },
+            },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              type: true,
+              code: true,
+              isPublished: true,
+              timeLimit: true,
+              passingScore: true,
+              maxAttempts: true,
+              shuffleQuestions: true,
+              tags: true,
+              createdAt: true,
+              instructorId: true,
+              _count: { select: { questions: true } },
+            },
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      },
+    },
+  });
+
+  const attemptedQuizIds = await prisma.quizAttempt.findMany({
+    where: { userId: session.user.id, submittedAt: { not: null } },
+    select: { quizId: true },
+    distinct: ["quizId"],
+  });
+
+  const attemptedSet = new Set(attemptedQuizIds.map((a) => a.quizId));
+
+  const quizzes: QuizData[] = [];
+  for (const c of connections) {
+    for (const q of c.instructor.quizzes) {
+      if (!attemptedSet.has(q.id)) {
+        quizzes.push({
+          id: q.id,
+          title: q.title,
+          description: q.description,
+          type: q.type as QuizType,
+          code: q.code,
+          isPublished: q.isPublished,
+          activeSessionId: null,
+          timeLimit: q.timeLimit,
+          passingScore: q.passingScore,
+          maxAttempts: q.maxAttempts,
+          shuffleQuestions: q.shuffleQuestions,
+          tags: q.tags,
+          createdAt: q.createdAt.toISOString(),
+          _count: { questions: q._count.questions, sessions: 0 },
+          averageScore: null,
+          questions: [],
+        });
+      }
+    }
+  }
+
+  return quizzes;
 }
 

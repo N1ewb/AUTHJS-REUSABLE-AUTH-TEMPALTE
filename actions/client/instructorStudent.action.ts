@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { notifyStudentConnected } from "@/actions/client/notification.action";
 
 function generateInviteCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -82,6 +83,8 @@ export async function linkStudentToInstructor(inviteCode: string): Promise<void>
       instructorId: instructor.id,
     },
   });
+
+  await notifyStudentConnected(instructor.id, session.user.name ?? "A student").catch((e) => console.error("notifyStudentConnected failed", e));
 }
 
 export async function getConnectedInstructors(): Promise<ConnectedInstructor[]> {

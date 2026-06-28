@@ -13,7 +13,7 @@ export default function Breadcrumbs() {
   const crumbs = segments.slice(1);
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-gray-500 mb-6">
+    <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
       {crumbs.map((segment, i) => {
         const href = "/" + segments.slice(0, i + 2).join("/");
         const label = segment.charAt(0).toUpperCase() + segment.slice(1);
@@ -21,9 +21,9 @@ export default function Breadcrumbs() {
 
         return (
           <React.Fragment key={href}>
-            {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-gray-300" />}
+            {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
             {isLast ? (
-              <span className="text-gray-900 font-medium">{label}</span>
+              <span className="text-card-foreground font-medium">{label}</span>
             ) : (
               <Link href={href} className="hover:text-[#56205E] transition">
                 {label}

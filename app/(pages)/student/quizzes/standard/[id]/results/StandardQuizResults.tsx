@@ -41,7 +41,7 @@ function StandardQuizResults({
   if (!result) {
     return (
       <div className="flex items-center justify-center flex-1 min-h-0 p-6">
-        <p className="text-sm text-gray-500">Results not available.</p>
+        <p className="text-sm text-muted-foreground">Results not available.</p>
       </div>
     );
   }
@@ -61,22 +61,22 @@ function StandardQuizResults({
           </div>
         )}
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-4">
+        <div className="bg-card rounded-xl border border-border p-8 space-y-4">
           {percentage >= 50 ? (
             <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-500" />
           ) : (
             <XCircle className="w-12 h-12 mx-auto text-red-500" />
           )}
 
-          <h1 className="text-xl font-semibold text-gray-900">{result.quizTitle}</h1>
+          <h1 className="text-xl font-semibold text-card-foreground">{result.quizTitle}</h1>
 
-          <div className="text-4xl font-bold text-gray-900">{percentage}%</div>
+          <div className="text-4xl font-bold text-card-foreground">{percentage}%</div>
 
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {result.score} / {result.totalPoints} points
           </div>
 
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {result.totalQuestions} question{result.totalQuestions !== 1 ? "s" : ""}
           </div>
         </div>
