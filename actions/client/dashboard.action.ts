@@ -3,6 +3,14 @@
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
 
+type QuizWithSessionAndCount = {
+  id: string;
+  title: string;
+  isPublished: boolean;
+  sessions: { id: string }[];
+  _count: { questions: number; sessions: number; attempts: number };
+};
+
 export type InstructorDashboardData = {
   stats: {
     totalQuizzes: number;
@@ -53,7 +61,9 @@ export async function getInstructorDashboard(): Promise<InstructorDashboardData>
         orderBy: { createdAt: "desc" },
         take: 10,
         include: {
-          _count: { select: { questions: true, sessions: true, attempts: true } },
+          _count: {
+            select: { questions: true, sessions: true, attempts: true },
+          },
           sessions: {
             where: { isActive: true },
             select: { id: true },
@@ -63,7 +73,7 @@ export async function getInstructorDashboard(): Promise<InstructorDashboardData>
       }),
     ]);
 
-  const quizIds = quizzes.map((q) => q.id);
+  const quizIds = quizzes.map((q: QuizWithSessionAndCount) => q.id);
   const scoreAggs = await prisma.quizAttempt.groupBy({
     by: ["quizId"],
     where: { quizId: { in: quizIds }, score: { not: null } },
@@ -78,9 +88,13 @@ export async function getInstructorDashboard(): Promise<InstructorDashboardData>
       totalParticipants,
       averageScore: avgScoreAgg._avg.score ?? null,
     },
-    recentQuizzes: quizzes.map((q) => {
+    recentQuizzes: quizzes.map((q: QuizWithSessionAndCount) => {
       const hasActiveSession = q.sessions.length > 0;
-      const status = !q.isPublished ? "Draft" : hasActiveSession ? "Active" : "Closed";
+      const status = !q.isPublished
+        ? "Draft"
+        : hasActiveSession
+          ? "Active"
+          : "Closed";
       return {
         id: q.id,
         title: q.title,

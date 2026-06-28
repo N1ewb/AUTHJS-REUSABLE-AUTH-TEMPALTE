@@ -169,7 +169,7 @@ export async function createQuiz(data: {
       data: {
         title,
         description: description || null,
-        type: (type as any) || "PREMADE",
+        type: (type as QuizType) || "PREMADE",
         timeLimit: timeLimit || null,
         passingScore: passingScore || null,
         maxAttempts: maxAttempts || 1,
@@ -181,7 +181,7 @@ export async function createQuiz(data: {
         questions: {
           create: questions.map((q, i) => ({
             text: q.text,
-            type: (q.type as any) || "MCQ",
+            type: (q.type as QuestionType) || "MCQ",
             points: q.points || 1,
             order: i + 1,
             ...(q.options?.length ? { options: q.options } : {}),
@@ -220,7 +220,7 @@ export async function addQuestion(
   await prisma.question.create({
     data: {
       text: data.text,
-      type: (data.type as any) || "MCQ",
+      type: (data.type as QuestionType) || "MCQ",
       points: data.points || 1,
       order: quiz._count.questions + 1,
       options: data.options ?? undefined,
@@ -255,7 +255,7 @@ export async function updateQuestion(
     where: { id },
     data: {
       text: data.text,
-      type: data.type as any,
+      type: data.type as QuestionType,
       points: data.points,
       ...(data.options ? { options: data.options } : {}),
       ...(data.answer !== undefined ? { answer: data.answer } : {}),
