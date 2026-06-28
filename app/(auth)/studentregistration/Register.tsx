@@ -2,7 +2,8 @@
 
 import { StudentRegistrationForm } from "@/components/forms/StudentRegistrationForm";
 import React from "react";
-
+import Purpleblulb from "../../../assets/purpleblulb.jpg";
+import Image from "next/image";
 export default function Register() {
   return (
     <div className="min-h-screen flex pt-16">
@@ -20,9 +21,9 @@ export default function Register() {
         </div>
       </div>
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#56205E] to-[#3A1542] items-center justify-center px-12">
-        <div className="max-w-md text-center">
-          <div className="w-64 h-64 mx-auto mb-8 rounded-2xl border-2 border-dashed border-purple-300/50 flex items-center justify-center bg-white/5">
-            <span className="text-purple-300/60 text-sm">Insert image</span>
+        <div className="flex flex-col items-center max-w-md text-center gap-5">
+          <div className="hidden md:flex items-center justify-center w-1/3">
+            <Image src={Purpleblulb} alt={"Bulb"} className="rounded-2xl " />
           </div>
           <h2 className="text-2xl font-bold text-white mb-4">
             Unlock your potential

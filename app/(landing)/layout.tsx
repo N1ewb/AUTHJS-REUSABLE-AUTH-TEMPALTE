@@ -12,7 +12,7 @@ export default async function LandingLayout({
     redirect(`/${session.user.role.toLowerCase()}/dashboard`);
   }
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-screen overflow-y-auto">
       <LandingHeader />
       {children}
     </main>

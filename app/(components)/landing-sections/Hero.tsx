@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-
+import Purpleblulb from "../../../assets/purpleblulb.jpg";
 export default function Hero() {
   return (
     <section className="relative flex-1 flex items-center overflow-hidden bg-gradient-to-br from-[#56205E] to-[#3A1542] min-h-screen">
@@ -9,8 +10,8 @@ export default function Hero() {
       <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[#9B3DAA] rounded-full opacity-20 blur-3xl" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-12 w-full">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="max-w-2xl">
+        <div className="flex justify-around items-center">
+          <div className="flex flex-col flex-1">
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
               Learn Together,
               <br />
@@ -38,10 +39,8 @@ export default function Hero() {
               </Link>
             </div>
           </div>
-          <div className="hidden md:flex items-center justify-center">
-            <div className="w-full max-w-md aspect-[4/3] rounded-2xl border-2 border-dashed border-purple-300/50 flex items-center justify-center bg-white/5">
-              <span className="text-purple-300/60 text-sm">Insert image</span>
-            </div>
+          <div className="hidden md:flex items-center justify-center w-1/3">
+            <Image src={Purpleblulb} alt={"Bulb"} className="rounded-2xl " />
           </div>
         </div>
       </div>
