@@ -6,7 +6,7 @@ import Purpleblulb from "../../../assets/purpleblulb.jpg";
 import Image from "next/image";
 export default function Register() {
   return (
-    <div className="flex flex-1 items-center min-h-screen w-full pt-16">
+    <div className="min-h-screen flex items-center pt-16">
       <div className="flex-1 flex items-center justify-center px-8 py-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
