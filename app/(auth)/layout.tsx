@@ -21,9 +21,9 @@ export default async function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col min-h-0">
       <LandingHeader />
-      {children}
+      <div className="flex flex-col min-h-0 overflow-auto">{children}</div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import React from "react";
 import Purpleblulb from "../../../assets/purpleblulb.jpg";
 export default function Hero() {
   return (
-    <section className="relative flex-1 flex items-center overflow-hidden bg-gradient-to-br from-[#56205E] to-[#3A1542] min-h-screen">
+    <section className="relative flex-1 flex items-center overflow-hidden bg-gradient-to-br from-[#56205E] to-[#3A1542] min-h-screen py-20">
       {/* Decorative blobs */}
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#7B2D8A] rounded-full opacity-30 blur-3xl" />
       <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[#9B3DAA] rounded-full opacity-20 blur-3xl" />
