@@ -21,7 +21,7 @@ export default function Register() {
         </div>
       </div>
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#56205E] to-[#3A1542] items-center justify-center">
-        <div className="flex flex-col flex-1 l items-center  text-center gap-5  justify-center">
+        <div className="flex flex-col items-center flex-1 text-center gap-5 min-h-screen justify-center">
           <div className="hidden md:flex items-center justify-center w-1/3">
             <Image src={Purpleblulb} alt={"Bulb"} className="rounded-2xl " />
           </div>
