@@ -130,7 +130,9 @@ function StudentDashboard() {
       <div className="flex flex-col flex-1 gap-6 min-h-0">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-card-foreground">Dashboard</h1>
+          <h1 className="text-2xl font-semibold text-card-foreground">
+            Dashboard
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Join live quizzes and browse your instructors&apos; quizzes.
           </p>
@@ -138,7 +140,7 @@ function StudentDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
           {/* Left column — join + connect */}
-          <div className="lg:col-span-2 flex flex-col gap-6 min-h-0 overflow-y-auto">
+          <div className="lg:col-span-2 flex flex-col gap-6 min-h-0 ">
             {/* Active session banner */}
             {activeSession && (
               <div className="p-5 rounded-xl border-2 border-[#56205E]/20 bg-gradient-to-r from-[#56205E]/5 to-transparent">
@@ -194,7 +196,7 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleJoin()}
                   placeholder="Session code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
+                  className="flex-1 text-center text-lg font-mono  border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
                   maxLength={6}
                 />
                 <button
@@ -233,7 +235,7 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleTakeQuiz()}
                   placeholder="Quiz code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.25em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 uppercase"
+                  className="flex-1 text-center text-lg font-mono  border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 uppercase"
                   maxLength={6}
                 />
                 <button
@@ -255,14 +257,7 @@ function StudentDashboard() {
                   <h2 className="text-base font-semibold text-card-foreground mb-3">
                     Recent Quizzes
                   </h2>
-                  <div
-                    className="flex flex-row-reverse gap-4 overflow-x-auto pb-2 scroll-smooth"
-                    onWheel={(e) => {
-                      if (e.deltaY !== 0) {
-                        e.currentTarget.scrollLeft += e.deltaY * 4;
-                      }
-                    }}
-                  >
+                  <div className="flex flex-row-reverse gap-4 overflow-x-auto pb-2 scroll-smooth mb-10">
                     {recentQuizzes.map((quiz) => (
                       <QuizCard
                         key={quiz.id}
@@ -303,13 +298,13 @@ function StudentDashboard() {
                   }}
                   onKeyDown={(e) => e.key === "Enter" && handleLinkInstructor()}
                   placeholder="Invite code"
-                  className="flex-1 text-center text-lg font-mono tracking-[0.15em] border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
+                  className="flex-1 text-center text-lg font-mono  border border-border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#56205E]/30 focus:border-[#56205E] uppercase"
                   maxLength={8}
                 />
                 <button
                   onClick={handleLinkInstructor}
                   disabled={invitePending || !inviteCode.trim()}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#56205E] text-white rounded-lg text-sm font-medium hover:bg-[#56205E]/90 transition-colors disabled:opacity-50 shrink-0"
+                  className="flex flex-1 items-center gap-2 px-5 py-2.5 bg-[#56205E] text-white rounded-lg text-sm font-medium hover:bg-[#56205E]/90 transition-colors disabled:opacity-50 shrink-0"
                 >
                   {invitePending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -343,7 +338,7 @@ function StudentDashboard() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col min-h-0 overflow-y-auto gap-2">
+              <div className="flex flex-col min-h-0 gap-2">
                 {instructors.map((inst) => (
                   <div
                     key={inst.instructorId}

@@ -129,7 +129,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
             className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#56205E]/20 focus:border-[#56205E]"
           />
         </div>
-        <div className="flex flex-row basis-1/3 justify-between items-start">
+        <div className="flex flex-row gap-3 items-start">
           {" "}
           <select
             value={statusFilter}
@@ -187,14 +187,7 @@ function QuizzesList({ quizzes }: { quizzes: QuizData[] }) {
           </p>
         </div>
       ) : (
-        <div
-          className="flex overflow-x-auto min-w-0 gap-4 scroll-smooth"
-          onWheel={(e) => {
-            if (e.deltaY !== 0) {
-              e.currentTarget.scrollLeft += e.deltaY * 4;
-            }
-          }}
-        >
+        <div className="flex overflow-x-auto min-w-0 gap-4 scroll-smooth">
           {filteredQuizzes.map((quiz) => (
             <QuizCard key={quiz.id} quiz={quiz} />
           ))}

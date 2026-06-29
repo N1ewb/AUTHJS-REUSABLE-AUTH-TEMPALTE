@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NotificationDropdown from "./NotificationDropdown";
 
 const nav = {
@@ -66,106 +66,127 @@ export default function Sidebar({ role }: { role: "instructor" | "student" }) {
   const links = nav[role];
   const [collapsed, setCollapsed] = useState(false);
 
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1024px)");
+
+    const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
+      setCollapsed(e.matches);
+    };
+
+    // Initial state
+    handleResize(media);
+
+    // Listen for changes
+    media.addEventListener("change", handleResize);
+
+    return () => {
+      media.removeEventListener("change", handleResize);
+    };
+  }, []);
+
   return (
-    <aside
-      className={`bg-card border-r pt-20 hidden h-screen max-h-screen lg:flex flex-col transition-all duration-200  ${
-        collapsed ? "w-16" : "w-64"
-      }`}
-    >
-      <nav className="flex flex-col gap-1 px-3 flex-1">
-        {links.map((link) => {
-          const active = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
-                active
-                  ? "bg-[#56205E] text-white"
-                  : "text-muted-foreground hover:bg-accent"
-              } ${collapsed ? "justify-center px-0" : ""}`}
-            >
-              <svg
-                className="w-5 h-5 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d={link.icon}
-                />
-              </svg>
-              {!collapsed && link.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <div
-        className={`px-3 pb-4 border-t pt-3 flex flex-col gap-1 ${collapsed ? "items-center" : ""}`}
+    <>
+      <div className={`lg:w-0 ${collapsed ? "w-16" : "w-0"}`}></div>
+      <aside
+        className={`bg-card border-r pt-20 h-screen max-h-screen flex  flex-col transition-all duration-200 justify-between fixed lg:static  ${
+          collapsed ? "w-16" : "w-64"
+        }`}
       >
-        {bottomLinks.map((link) =>
-          link.label === "Notifications" ? (
-            <NotificationDropdown
-              key={link.label}
-              icon={link.icon}
-              label={link.label}
-              collapsed={collapsed}
-            />
-          ) : (
-            <Link
-              key={link.label}
-              href={link.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-muted-foreground hover:bg-accent ${
-                collapsed ? "justify-center px-0" : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
+        <nav className="flex flex-col gap-1 px-3 flex-1">
+          {links.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+                  active
+                    ? "bg-[#56205E] text-white"
+                    : "text-muted-foreground hover:bg-accent"
+                } ${collapsed ? "justify-center px-0" : ""}`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d={link.icon}
-                />
-              </svg>
-              {!collapsed && link.label}
-            </Link>
-          )
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-muted-foreground hover:bg-accent mt-1 ${
-            collapsed ? "justify-center px-0" : ""
-          }`}
-          title={collapsed ? "Expand sidebar" : "Minimize sidebar"}
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={link.icon}
+                  />
+                </svg>
+                {!collapsed && link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div
+          className={`px-3 pb-4 border-t pt-3 flex flex-col gap-1 ${collapsed ? "items-center " : ""}`}
         >
-          <svg
-            className="w-5 h-5 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
+          {bottomLinks.map((link) =>
+            link.label === "Notifications" ? (
+              <NotificationDropdown
+                key={link.label}
+                icon={link.icon}
+                label={link.label}
+                collapsed={collapsed}
+              />
+            ) : (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-muted-foreground hover:bg-accent ${
+                  collapsed ? "justify-center px-0" : ""
+                }`}
+              >
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={link.icon}
+                  />
+                </svg>
+                {!collapsed && link.label}
+              </Link>
+            ),
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-muted-foreground hover:bg-accent mt-1 ${
+              collapsed ? "justify-center px-0" : ""
+            }`}
+            title={collapsed ? "Expand sidebar" : "Minimize sidebar"}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d={
-                collapsed
-                  ? "M8.25 4.5l7.5 7.5-7.5 7.5"
-                  : "M15.75 19.5L8.25 12l7.5-7.5"
-              }
-            />
-          </svg>
-          {!collapsed && "Minimize"}
-        </button>
-      </div>
-    </aside>
+            <svg
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d={
+                  collapsed
+                    ? "M8.25 4.5l7.5 7.5-7.5 7.5"
+                    : "M15.75 19.5L8.25 12l7.5-7.5"
+                }
+              />
+            </svg>
+            {!collapsed && "Minimize"}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

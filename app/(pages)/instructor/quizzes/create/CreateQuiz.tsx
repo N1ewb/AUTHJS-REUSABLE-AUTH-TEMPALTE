@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { createQuiz } from "@/actions/client/quiz.action";
+import BulkPasteDialog from "@/app/(components)/BulkPasteDialog";
 import {
   Check,
   ChevronLeft,
@@ -92,6 +93,8 @@ function CreateQuiz() {
 
   // Step 3 - Questions
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [missingAnswerId, setMissingAnswerId] = useState<string | null>(null);
+  const [editingScrollTarget, setEditingScrollTarget] = useState<string | null>(null);
 
   // Step 4 - Settings
   const [quizType, setQuizType] = useState<string>("PREMADE");
@@ -99,81 +102,6 @@ function CreateQuiz() {
   const [passingScore, setPassingScore] = useState<number>(75);
   const [maxAttempts, setMaxAttempts] = useState<number>(1);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
-
-  // --- Paste parser ---
-  const [pasteOpen, setPasteOpen] = useState(false);
-  const [pasteText, setPasteText] = useState("");
-
-  const parsePaste = () => {
-    const lines = pasteText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    let questionText = "";
-    const options: { label: string; text: string }[] = [];
-    let correctLabel = "";
-
-    const letterLabels = ["A", "B", "C", "D", "E", "F"];
-    const numberToLabel: Record<string, string> = {
-      "1": "A",
-      "2": "B",
-      "3": "C",
-      "4": "D",
-      "5": "E",
-      "6": "F",
-    };
-    let bulletIndex = 0;
-
-    for (const line of lines) {
-      const answerMatch = line.match(
-        /^(?:answer|correct|ans)[:\-]?\s*([A-Ea-e1-4])/i,
-      );
-      if (answerMatch) {
-        const raw = answerMatch[1].toUpperCase();
-        correctLabel = numberToLabel[raw] || raw;
-        continue;
-      }
-
-      const letterMatch = line.match(/^([A-Ea-e1-4])[.)]\s*/);
-      if (letterMatch) {
-        const raw = letterMatch[1].toUpperCase();
-        const label = numberToLabel[raw] || raw;
-        options.push({ label, text: line.slice(letterMatch[0].length).trim() });
-        continue;
-      }
-
-      const bulletMatch = line.match(/^[-*•]\s+/);
-      if (bulletMatch && bulletIndex < 6) {
-        const label = letterLabels[bulletIndex];
-        options.push({ label, text: line.slice(bulletMatch[0].length).trim() });
-        bulletIndex++;
-        continue;
-      }
-
-      const cleaned = line
-        .replace(/^_{3,}|^[-]{3,}|^[*]{3,}/, "")
-        .replace(/^\d+[.)]\s*/, "")
-        .trim();
-      if (cleaned) {
-        questionText += (questionText ? " " : "") + cleaned;
-      }
-    }
-
-    if (questionText) setQText(questionText);
-    if (options.length >= 2) {
-      setQOptions(
-        options.map((o) => ({
-          label: o.label,
-          text: o.text,
-          isCorrect: o.label === correctLabel,
-        })),
-      );
-    }
-    setQType("MCQ");
-    setPasteOpen(false);
-    setPasteText("");
-    setShowQuestionForm(true);
-  };
 
   // --- New question form ---
   const [showQuestionForm, setShowQuestionForm] = useState(false);
@@ -211,6 +139,29 @@ function CreateQuiz() {
       });
       return;
     }
+
+    if (currentStep === 2) {
+      const missing = questions.find(
+        (q) => q.type === "MCQ" && !q.options.some((o) => o.isCorrect),
+      );
+      if (missing) {
+        setMissingAnswerId(missing.id);
+        editQuestion(missing);
+        toast({
+          title: "Correct Answer Required",
+          description: `Question ${missing.order}: Click the circle next to the correct option to mark the answer.`,
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          const el = document.querySelector(`[data-question-id="${missing.id}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 0);
+        return;
+      }
+    }
+
     if (currentStep < 4) setCurrentStep(currentStep + 1);
   };
 
@@ -223,7 +174,7 @@ function CreateQuiz() {
       case 1:
         return "Please enter a title and select at least one tag";
       case 2:
-        return "Please add at least one question";
+        return "Please add at least one question and set the correct answer for each MCQ";
       case 3:
         return "Please fill in all settings";
       default:
@@ -248,6 +199,7 @@ function CreateQuiz() {
 
   // --- Questions ---
   const resetQuestionForm = () => {
+    const target = editingScrollTarget;
     setQText("");
     setQType("MCQ");
     setQPoints(1);
@@ -258,6 +210,13 @@ function CreateQuiz() {
     setQAnswer("");
     setEditingQuestionId(null);
     setShowQuestionForm(false);
+    setEditingScrollTarget(null);
+    if (target) {
+      setTimeout(() => {
+        const el = document.querySelector(`[data-question-id="${target}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+    }
   };
 
   const addOption = () => {
@@ -283,9 +242,25 @@ function CreateQuiz() {
   };
 
   const setCorrectOption = (index: number) => {
-    setQOptions((prev) =>
-      prev.map((opt, i) => ({ ...opt, isCorrect: i === index })),
-    );
+    const updated = qOptions.map((opt, i) => ({
+      ...opt,
+      isCorrect: i === index,
+    }));
+    setQOptions(updated);
+
+    if (missingAnswerId && editingQuestionId) {
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === editingQuestionId ? { ...q, options: updated } : q,
+        ),
+      );
+      setMissingAnswerId(null);
+      toast({
+        title: "Answer Saved",
+        description: "Correct answer has been set. You can now proceed.",
+      });
+      resetQuestionForm();
+    }
   };
 
   const saveQuestion = () => {
@@ -364,6 +339,7 @@ function CreateQuiz() {
   };
 
   const editQuestion = (q: Question) => {
+    setEditingScrollTarget(q.id);
     setQText(q.text);
     setQType(q.type);
     setQPoints(q.points);
@@ -385,6 +361,10 @@ function CreateQuiz() {
     setQAnswer(q.answer || "");
     setEditingQuestionId(q.id);
     setShowQuestionForm(true);
+    setTimeout(() => {
+      const el = document.querySelector(`[data-question-id="${q.id}"]`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 0);
   };
 
   const deleteQuestion = (id: string) => {
@@ -485,10 +465,10 @@ function CreateQuiz() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-card rounded-xl border p-6 md:p-8 flex flex-col flex-grow min-h-0">
+        <div className="bg-card rounded-xl border p-6 md:p-8 flex flex-col flex-grow min-h-0 overflow-auto">
           {/* Step 1: Details (Title + Tags) */}
           {currentStep === 1 && (
-            <div className="flex flex-col space-y-8 min-h-0 ">
+            <div className="flex flex-col space-y-8  ">
               <div>
                 <h2 className="text-xl font-semibold text-card-foreground">
                   Quiz Details
@@ -526,10 +506,50 @@ function CreateQuiz() {
                 </div>
               </div>
 
-              <div className="border-t pt-6">
-                <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  Tags <span className="text-red-500">*</span>
-                </label>
+              <div className="border-t pt-6 flex flex-col gap-3">
+                <div className="flex flex-col">
+                  <label className="block text-sm font-medium text-muted-foreground mb-3">
+                    Tags <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add a custom tag..."
+                      value={customTag}
+                      onChange={(e) => setCustomTag(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), addCustomTag())
+                      }
+                      className="max-w-xs"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={addCustomTag}
+                      disabled={!customTag.trim()}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {selectedTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {selectedTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-[#56205E]/10 text-[#56205E]"
+                        >
+                          {tag}
+                          <button
+                            onClick={() => toggleTag(tag)}
+                            className="hover:text-red-500"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {PREDEFINED_TAGS.map((tag) => (
                     <button
@@ -545,51 +565,14 @@ function CreateQuiz() {
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Add a custom tag..."
-                    value={customTag}
-                    onChange={(e) => setCustomTag(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && (e.preventDefault(), addCustomTag())
-                    }
-                    className="max-w-xs"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={addCustomTag}
-                    disabled={!customTag.trim()}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                {selectedTags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {selectedTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-[#56205E]/10 text-[#56205E]"
-                      >
-                        {tag}
-                        <button
-                          onClick={() => toggleTag(tag)}
-                          className="hover:text-red-500"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           )}
 
           {/* Step 2: Questions */}
           {currentStep === 2 && (
-            <div className="space-y-6 flex-grow flex flex-col min-h-0 ">
-              <div className="flex items-center justify-between  min-h-0">
+            <div className="space-y-6 flex-grow flex flex-col ">
+              <div className="flex items-center justify-between  ">
                 <div className="">
                   <h2 className=" text-xl font-semibold text-card-foreground">
                     Quiz Questions
@@ -599,45 +582,50 @@ function CreateQuiz() {
                   </p>
                 </div>
                 {!showQuestionForm && (
-                  <Button
-                    onClick={() => setShowQuestionForm(true)}
-                    className="bg-[#56205E] hover:bg-[#4A1A52] text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Question
-                  </Button>
+                  <div className="flex items-center gap-5">
+                    <BulkPasteDialog
+                      onParsed={(parsed) => {
+                        setQuestions((prev) => [
+                          ...prev,
+                          ...parsed.map((q, i) => ({
+                            id: crypto.randomUUID(),
+                            text: q.text,
+                            type: q.type as QuestionType,
+                            points: q.points,
+                            order: prev.length + i + 1,
+                            options: q.options ?? [],
+                            answer: q.answer ?? "",
+                          })),
+                        ]);
+                      }}
+                    />
+                    <Button
+                      onClick={() => setShowQuestionForm(true)}
+                      className="bg-[#56205E] hover:bg-[#4A1A52] text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Question
+                    </Button>
+                  </div>
                 )}
               </div>
               {/* Question Form */}
               {showQuestionForm && (
-                <div className="bg-muted rounded-lg border p-5 space-y-4 flex flex-col ">
-                  <div className="flex items-center justify-between">
+                <div
+                  data-question-id={editingQuestionId ?? ""}
+                  className="flex flex-col bg-muted rounded-lg border p-5 space-y-4 "
+                >
+                  <div className="flex items-center justify-between ">
                     <h3 className="font-medium text-card-foreground">
                       {editingQuestionId ? "Edit Question" : "New Question"}
                     </h3>
-
-                    <div className="flex flex-row-reverse align-middle justify-center items-center  gap-10">
-                      <button
-                        onClick={resetQuestionForm}
-                        className="text-sm text-red-500 hover:text-muted-foreground flex flex-grow"
-                      >
-                        Cancel
-                      </button>
-
-                      <Button
-                        onClick={saveQuestion}
-                        className="bg-green-700 hover:bg-[#4A1A52] text-white"
-                      >
-                        {editingQuestionId ? "Update Question" : "Add Question"}
-                      </Button>
-                    </div>
                   </div>
 
                   <div className="flex flex-col min-h-0 ">
                     <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                       Question Type
                     </label>
-                    <div className="flex flex-wrap gap-2 min-h-0 ">
+                    <div className="flex flex-wrap gap-2  ">
                       {QUESTION_TYPES.map((qt) => (
                         <button
                           key={qt.value}
@@ -698,6 +686,17 @@ function CreateQuiz() {
                       <label className="block text-sm font-medium text-muted-foreground">
                         Answer Options <span className="text-red-500">*</span>
                       </label>
+                      {missingAnswerId &&
+                        !qOptions.some((o) => o.isCorrect) && (
+                          <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+                            Click the circle ({" "}
+                            <span className="font-mono font-bold">A</span>{" "}
+                            <span className="font-mono font-bold">B</span>{" "}
+                            <span className="font-mono font-bold">C</span> ... )
+                            next to the correct option to mark it as the correct
+                            answer.
+                          </div>
+                        )}
                       {qOptions.map((option, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <button
@@ -733,17 +732,36 @@ function CreateQuiz() {
                           )}
                         </div>
                       ))}
-                      {qOptions.length < 6 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={addOption}
-                          className="text-[#56205E]"
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Add Option
-                        </Button>
-                      )}
+                      <div className="flex justify-between">
+                        {qOptions.length < 6 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={addOption}
+                            className="text-[#56205E]"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Add Option
+                          </Button>
+                        )}
+                        <div className="flex flex-row-reverse align-middle justify-center items-center  gap-10">
+                          <button
+                            onClick={resetQuestionForm}
+                            className="text-sm text-red-500 hover:text-muted-foreground flex flex-grow"
+                          >
+                            Cancel
+                          </button>
+
+                          <Button
+                            onClick={saveQuestion}
+                            className="bg-green-700 hover:bg-[#4A1A52] text-white"
+                          >
+                            {editingQuestionId
+                              ? "Update Question"
+                              : "Add Question"}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -797,10 +815,11 @@ function CreateQuiz() {
 
               {/* Question List */}
               {questions.length > 0 && (
-                <div className="space-y-3 flex flex-col min-h-0 overflow-auto">
+                <div className="space-y-3 flex flex-col ">
                   {questions.map((q, index) => (
                     <div
                       key={q.id}
+                      data-question-id={q.id}
                       className="flex items-start gap-3 p-4 bg-card border rounded-lg hover:border-[#56205E]/30 transition-colors"
                     >
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#56205E]/10 text-[#56205E] text-sm font-semibold shrink-0">
@@ -998,7 +1017,9 @@ function CreateQuiz() {
                 </div>
                 {description && (
                   <div className="p-4 flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Description</span>
+                    <span className="text-sm text-muted-foreground">
+                      Description
+                    </span>
                     <span className="text-sm text-card-foreground max-w-xs text-right line-clamp-2">
                       {description}
                     </span>
@@ -1018,37 +1039,49 @@ function CreateQuiz() {
                   </div>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Questions</span>
+                  <span className="text-sm text-muted-foreground">
+                    Questions
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {questions.length} questions
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Total Points</span>
+                  <span className="text-sm text-muted-foreground">
+                    Total Points
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {questions.reduce((sum, q) => sum + q.points, 0)} pts
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Quiz Type</span>
+                  <span className="text-sm text-muted-foreground">
+                    Quiz Type
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {QUIZ_TYPES.find((qt) => qt.value === quizType)?.label}
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Time Limit</span>
+                  <span className="text-sm text-muted-foreground">
+                    Time Limit
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {timeLimit} minutes
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Passing Score</span>
+                  <span className="text-sm text-muted-foreground">
+                    Passing Score
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {passingScore}%
                   </span>
                 </div>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Max Attempts</span>
+                  <span className="text-sm text-muted-foreground">
+                    Max Attempts
+                  </span>
                   <span className="text-sm font-medium text-card-foreground">
                     {maxAttempts}
                   </span>
@@ -1124,69 +1157,6 @@ function CreateQuiz() {
           </div>
         </div>
       </div>
-
-      {/* Paste Panel */}
-      <button
-        onClick={() => setPasteOpen(!pasteOpen)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#56205E] text-white px-1.5 py-8 rounded-l-md text-xs font-medium writing-mode-vertical hover:bg-[#4A1A52] transition"
-        style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
-      >
-        {pasteOpen ? "Close" : "Paste"}
-      </button>
-
-      {pasteOpen && (
-        <div className="fixed right-0 top-0 h-full w-80 bg-card border-l shadow-lg z-30 pt-20 flex flex-col">
-          <div className="px-4 py-3 border-b">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-card-foreground text-sm">
-                Quick Paste
-              </h3>
-              <button
-                onClick={() => setPasteOpen(false)}
-                className="text-muted-foreground hover:text-muted-foreground"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Supports <span className="font-mono text-[#56205E]">A.</span>{" "}
-              <span className="font-mono text-[#56205E]">A)</span>{" "}
-              <span className="font-mono text-[#56205E]">1.</span>{" "}
-              <span className="font-mono text-[#56205E]">-</span> bullet
-              formats. Prefix{" "}
-              <span className="font-mono text-[#56205E]">Answer: A</span> to
-              mark correct choice.
-            </p>
-          </div>
-          <div className="flex-1 p-4 flex flex-col gap-3">
-            <textarea
-              placeholder={`Paste question here...\ne.g. What is Java?\nA. A language\nB. A coffee\nC. An island\nD. A framework`}
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-              className="flex-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#56205E] focus:border-transparent resize-none"
-            />
-            <Button
-              onClick={parsePaste}
-              disabled={!pasteText.trim()}
-              className="bg-[#56205E] hover:bg-[#4A1A52] text-white w-full"
-            >
-              Fill Question Form
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

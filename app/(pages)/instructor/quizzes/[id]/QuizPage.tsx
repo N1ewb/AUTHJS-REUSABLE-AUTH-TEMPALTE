@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import DefaultBG from "../../../../../assets/quizpage-default.png";
 import AddQuestionForm from "@/app/(components)/AddQuestionForm";
+import BulkPasteDialog from "@/app/(components)/BulkPasteDialog";
 import DeleteQuizButton from "@/app/(components)/DeleteQuizButton";
 import PublishToggle from "@/app/(components)/PublishToggle";
 import QuizPageQuestions from "@/app/(components)/QuizPageQuestions";
@@ -17,8 +18,8 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <div className="flex justify-between rounded-2xl border border-border w-full p-6 ">
-        <div className="flex flex-col justify-between flex-grow">
+      <div className="flex gap-6 rounded-2xl border border-border w-full px-6 pt-5">
+        <div className="flex flex-col gap-5 flex-grow">
           <div className="flex gap-2 items-center">
             <p className="flex items-center gap-1 text-[12px]">
               <Radio className="bg-muted-foreground/30 text-muted-foreground p-1 rounded-full" />
@@ -35,7 +36,7 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
           </div>
           <div className="flex flex-col gap-3">
             <h1 className="text-3xl font-bold">{quiz.title}</h1>
-            <p className="text-[12px]">{quiz.description}</p>
+            {quiz.description && <p className="text-[12px]">{}</p>}
             {tags.length > 0 && (
               <div className="flex">
                 <p className="text-muted-foreground bg-muted text-[10px] text-center rounded-full px-3">
@@ -98,7 +99,7 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
             </Link>
           </div>
           <div className="flex">
-            <CopyInviteCode quizId={quiz.id} code={quiz.code} />
+            {isLive ? "" : <CopyInviteCode quizId={quiz.id} code={quiz.code} />}
           </div>
         </div>
         <div className="w-[30%]">
@@ -107,11 +108,14 @@ function QuizPage({ quiz }: { quiz: QuizData }) {
       </div>
 
       <div className="mt-8 overflow-y-auto flex flex-col flex-grow min-h-0">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 pr-5">
           <h2 className="text-lg font-semibold text-card-foreground">
             Questions ({quiz._count.questions})
           </h2>
-          <AddQuestionForm quizId={quiz.id} />
+          <div className="flex items-center gap-3">
+            <BulkPasteDialog quizId={quiz.id} />
+            <AddQuestionForm quizId={quiz.id} />
+          </div>
         </div>
 
         {quiz.questions.length > 0 ? (

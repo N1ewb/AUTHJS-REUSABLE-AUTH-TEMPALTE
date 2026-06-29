@@ -1110,3 +1110,32 @@ export async function getRecentUnattemptedQuizzes() {
   return quizzes;
 }
 
+export async function getLiveQuizProgress(sessionId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const attempt = await prisma.quizAttempt.findFirst({
+    where: { sessionId, userId: session.user.id },
+    select: {
+      id: true,
+      quiz: {
+        select: { _count: { select: { questions: true } } },
+      },
+    },
+  });
+
+  if (!attempt) throw new Error("Attempt not found");
+
+  const answers = await prisma.answer.findMany({
+    where: { attemptId: attempt.id },
+    select: {
+      question: { select: { order: true } },
+    },
+  });
+
+  return {
+    totalQuestions: attempt.quiz._count.questions,
+    answeredQuestions: answers.map((a) => a.question.order),
+  };
+}
+

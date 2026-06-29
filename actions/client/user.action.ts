@@ -12,7 +12,12 @@ import { Prisma, Role } from "@prisma/client";
 export async function login(data: LoginFormData) {
   try {
     await signIn("credentials", { redirect: false, ...data });
-    return { success: true, message: "Logged In" };
+    const session = await auth();
+    return {
+      success: true,
+      message: "Logged In",
+      role: session?.user?.role?.toLowerCase() ?? null,
+    };
   } catch (error) {
     return { success: false, message: "Incorrect Email or Password" };
   }

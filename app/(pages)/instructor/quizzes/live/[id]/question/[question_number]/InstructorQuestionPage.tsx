@@ -95,6 +95,7 @@ function InstructorQuestionPage({
           )}
         </div>
       </div>
+
       {question.type === "MCQ" && question.options && (
         <div className="space-y-3 mb-6">
           {question.options.map((option) => (
@@ -105,7 +106,9 @@ function InstructorQuestionPage({
               <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground shrink-0">
                 {option.label}
               </span>
-              <span className="text-sm text-card-foreground">{option.text}</span>
+              <span className="text-sm text-card-foreground">
+                {option.text}
+              </span>
               {option.isCorrect && (
                 <span className="ml-auto text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
                   Correct

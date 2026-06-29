@@ -3,6 +3,7 @@
 import {
   submitStandardAnswer,
   finishStandardAttempt,
+  getAnsweredQuestions,
 } from "@/actions/client/standardQuiz.action";
 import type { QuizQuestion } from "@/lib/types";
 import {
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { QuestionProgress } from "@/app/(components)/QuestionProgress";
 
 function StandardQuestionPage({
   quizCode,
@@ -36,8 +38,16 @@ function StandardQuestionPage({
   const [selected, setSelected] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const expiredRef = useRef(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
 
   const timeLimit = timeLimitParam ? parseInt(timeLimitParam) : null;
+
+  useEffect(() => {
+    if (!attemptId) return;
+    getAnsweredQuestions(attemptId)
+      .then(setAnsweredQuestions)
+      .catch(() => {});
+  }, [attemptId]);
 
   useEffect(() => {
     if (!timeLimit || !startedAt) return;
@@ -78,6 +88,9 @@ function StandardQuestionPage({
     setSelected(label);
     startTransition(async () => {
       await submitStandardAnswer(attemptId, question.id, { label, text });
+      setAnsweredQuestions((prev) =>
+        prev.includes(questionNumber) ? prev : [...prev, questionNumber],
+      );
     });
   }
 
@@ -85,7 +98,13 @@ function StandardQuestionPage({
     e.preventDefault();
     if (isPending || !selected) return;
     startTransition(async () => {
-      await submitStandardAnswer(attemptId, question.id, { label: "", text: selected });
+      await submitStandardAnswer(attemptId, question.id, {
+        label: "",
+        text: selected,
+      });
+      setAnsweredQuestions((prev) =>
+        prev.includes(questionNumber) ? prev : [...prev, questionNumber],
+      );
     });
   }
 
@@ -102,7 +121,9 @@ function StandardQuestionPage({
     expiredRef.current = true;
     startTransition(async () => {
       await finishStandardAttempt(attemptId);
-      router.push(`/student/quizzes/standard/${quizCode}/results?attemptId=${attemptId}`);
+      router.push(
+        `/student/quizzes/standard/${quizCode}/results?attemptId=${attemptId}`,
+      );
     });
   }
 
@@ -138,7 +159,11 @@ function StandardQuestionPage({
           {formatTime(timeLeft)}
         </div>
       )}
-
+      <QuestionProgress
+        currentQuestion={questionNumber}
+        totalQuestions={totalQuestions}
+        answeredQuestions={answeredQuestions}
+      />
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 p-6">
         <div className="max-w-2xl w-full space-y-6">
           <div className="flex items-center justify-between">
@@ -151,7 +176,9 @@ function StandardQuestionPage({
           </div>
 
           <div className="bg-card rounded-xl border border-border p-6">
-            <p className="text-lg font-medium text-card-foreground">{question.text}</p>
+            <p className="text-lg font-medium text-card-foreground">
+              {question.text}
+            </p>
           </div>
 
           {question.type === "MCQ" && question.options && (
@@ -176,7 +203,9 @@ function StandardQuestionPage({
                   >
                     {option.label}
                   </span>
-                  <span className="text-sm text-card-foreground">{option.text}</span>
+                  <span className="text-sm text-card-foreground">
+                    {option.text}
+                  </span>
                   {isPending && selected === option.label && (
                     <Loader2 className="w-4 h-4 animate-spin ml-auto shrink-0 text-emerald-600" />
                   )}

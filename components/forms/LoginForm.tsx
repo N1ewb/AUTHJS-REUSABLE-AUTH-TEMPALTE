@@ -49,7 +49,8 @@ export function LoginForm() {
           title: "Sign In",
           description: "Logged in Successfully",
         });
-        router.refresh();
+        const role = res.role ?? "student";
+        router.push(`/${role}/dashboard`);
       } else {
         toast({
           title: "Error",

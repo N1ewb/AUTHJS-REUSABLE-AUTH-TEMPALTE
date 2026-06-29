@@ -3,13 +3,17 @@
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { notifyQuizAttempts } from "@/actions/client/notification.action";
-import type { QuizQuestion, QuizQuestionOption, QuestionType } from "@/lib/types";
+import type {
+  QuizQuestion,
+  QuizQuestionOption,
+  QuestionType,
+} from "@/lib/types";
 
 export async function getQuizByCode(code: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const quiz = await prisma.quiz.findFirst({
+  const quiz = (await prisma.quiz.findFirst({
     where: { code, isPublished: true, type: "PREMADE" },
     include: {
       instructor: { select: { id: true, name: true } },
@@ -27,14 +31,25 @@ export async function getQuizByCode(code: string) {
         },
       },
     },
-  }) as unknown as {
-    id: string; title: string; description: string | null; code: string | null;
-    timeLimit: number | null; passingScore: number | null; maxAttempts: number;
-    shuffleQuestions: boolean; instructor: { id: string; name: string };
+  })) as unknown as {
+    id: string;
+    title: string;
+    description: string | null;
+    code: string | null;
+    timeLimit: number | null;
+    passingScore: number | null;
+    maxAttempts: number;
+    shuffleQuestions: boolean;
+    instructor: { id: string; name: string };
     _count: { questions: number };
     questions: Array<{
-      id: string; text: string; type: QuestionType; points: number;
-      order: number; options: unknown; answer: string | null;
+      id: string;
+      text: string;
+      type: QuestionType;
+      points: number;
+      order: number;
+      options: unknown;
+      answer: string | null;
     }>;
   } | null;
 
@@ -51,7 +66,7 @@ export async function getQuizByCode(code: string) {
     shuffleQuestions: quiz.shuffleQuestions,
     instructor: quiz.instructor,
     _count: quiz._count,
-    questions: quiz.questions.map((q) => ({
+    questions: quiz.questions.map((q /*q has implicit any type error*/) => ({
       id: q.id,
       text: q.text,
       type: q.type as QuestionType,
@@ -68,11 +83,20 @@ export async function startStandardAttempt(quizId: string) {
   if (!session?.user?.id) throw new Error("Unauthorized");
 
   const existing = await prisma.quizAttempt.findFirst({
-    where: { userId: session.user.id, quizId, submittedAt: null, sessionId: null },
+    where: {
+      userId: session.user.id,
+      quizId,
+      submittedAt: null,
+      sessionId: null,
+    },
     select: { id: true, startedAt: true },
   });
 
-  if (existing) return { attemptId: existing.id, startedAt: existing.startedAt.toISOString() };
+  if (existing)
+    return {
+      attemptId: existing.id,
+      startedAt: existing.startedAt.toISOString(),
+    };
 
   const quiz = await prisma.quiz.findUnique({
     where: { id: quizId },
@@ -145,34 +169,56 @@ export async function finishStandardAttempt(attemptId: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const attempt = await prisma.quizAttempt.findFirst({
+  const attempt = (await prisma.quizAttempt.findFirst({
     where: { id: attemptId, userId: session.user.id },
     include: {
       answers: true,
       quiz: {
         select: {
           questions: {
-            select: { id: true, type: true, points: true, options: true, answer: true },
+            select: {
+              id: true,
+              type: true,
+              points: true,
+              options: true,
+              answer: true,
+            },
           },
         },
       },
     },
-  }) as unknown as {
-    id: string; quizId: string;
+  })) as unknown as {
+    id: string;
+    quizId: string;
     answers: Array<{
-      id: string; attemptId: string; questionId: string; response: unknown;
-      createdAt: Date; updatedAt: Date; isCorrect: boolean | null; pointsAwarded: number | null;
+      id: string;
+      attemptId: string;
+      questionId: string;
+      response: unknown;
+      createdAt: Date;
+      updatedAt: Date;
+      isCorrect: boolean | null;
+      pointsAwarded: number | null;
     }>;
     quiz: {
       questions: Array<{
-        id: string; type: QuestionType; points: number; options: unknown; answer: string | null;
+        id: string;
+        type: QuestionType;
+        points: number;
+        options: unknown;
+        answer: string | null;
       }>;
     };
   } | null;
 
   if (!attempt) throw new Error("Attempt not found");
 
-  const questionMap = new Map(attempt.quiz.questions.map((q) => [q.id, q]));
+  const questionMap = new Map(
+    attempt.quiz.questions.map((q /*q has implicit any type error*/) => [
+      q.id,
+      q,
+    ]),
+  );
   let score = 0;
   let totalPoints = 0;
 
@@ -191,11 +237,19 @@ export async function finishStandardAttempt(attemptId: string) {
 
     if (question.type === "MCQ" && Array.isArray(question.options)) {
       const correctOption = (
-        question.options as { label: string; text: string; isCorrect: boolean }[]
+        question.options as {
+          label: string;
+          text: string;
+          isCorrect: boolean;
+        }[]
       ).find((o) => o.isCorrect);
       isCorrect = correctOption?.label === response.label;
-    } else if (question.type === "TRUE_FALSE" || question.type === "IDENTIFICATION") {
-      isCorrect = question.answer?.toLowerCase() === response.text.toLowerCase();
+    } else if (
+      question.type === "TRUE_FALSE" ||
+      question.type === "IDENTIFICATION"
+    ) {
+      isCorrect =
+        question.answer?.toLowerCase() === response.text.toLowerCase();
     }
 
     await prisma.answer.update({
@@ -213,7 +267,9 @@ export async function finishStandardAttempt(attemptId: string) {
     data: { score, totalPoints, submittedAt: new Date() },
   });
 
-  await notifyQuizAttempts(attempt.quizId).catch((e) => console.error("notifyQuizAttempts failed", e));
+  await notifyQuizAttempts(attempt.quizId).catch((e) =>
+    console.error("notifyQuizAttempts failed", e),
+  );
 
   return { score, totalPoints };
 }
@@ -252,7 +308,7 @@ export async function getStudentQuizAttempts(quizId: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const attempts = await prisma.quizAttempt.findMany({
+  const attempts = (await prisma.quizAttempt.findMany({
     where: { userId: session.user.id, quizId, submittedAt: { not: null } },
     orderBy: { submittedAt: "desc" },
     include: {
@@ -266,16 +322,22 @@ export async function getStudentQuizAttempts(quizId: string) {
         },
       },
     },
-  }) as unknown as Array<{
-    id: string; score: number | null; totalPoints: number | null;
-    startedAt: Date; submittedAt: Date | null;
+  })) as unknown as Array<{
+    id: string;
+    score: number | null;
+    totalPoints: number | null;
+    startedAt: Date;
+    submittedAt: Date | null;
     answers: Array<{
-      id: string; questionId: string; response: unknown;
-      isCorrect: boolean | null; pointsAwarded: number | null;
+      id: string;
+      questionId: string;
+      response: unknown;
+      isCorrect: boolean | null;
+      pointsAwarded: number | null;
     }>;
   }>;
 
-  const quiz = await prisma.quiz.findUnique({
+  const quiz = (await prisma.quiz.findUnique({
     where: { id: quizId },
     select: {
       questions: {
@@ -291,38 +353,46 @@ export async function getStudentQuizAttempts(quizId: string) {
         },
       },
     },
-  }) as unknown as {
+  })) as unknown as {
     questions: Array<{
-      id: string; text: string; type: QuestionType; points: number;
-      order: number; options: unknown; answer: string | null;
+      id: string;
+      text: string;
+      type: QuestionType;
+      points: number;
+      order: number;
+      options: unknown;
+      answer: string | null;
     }>;
   } | null;
 
   if (!quiz) throw new Error("Quiz not found");
 
-  const questions = quiz.questions.map((q) => {
-    const rawOptions = q.options;
-    const parsedOptions = typeof rawOptions === "string" ? JSON.parse(rawOptions) : rawOptions;
-    return {
-      id: q.id,
-      text: q.text,
-      type: q.type as QuestionType,
-      points: q.points,
-      order: q.order,
-      options: parsedOptions as QuizQuestionOption[] | null,
-      answer: q.answer,
-    };
-  });
+  const questions = quiz.questions.map(
+    (q /*q has implicit any type error*/) => {
+      const rawOptions = q.options;
+      const parsedOptions =
+        typeof rawOptions === "string" ? JSON.parse(rawOptions) : rawOptions;
+      return {
+        id: q.id,
+        text: q.text,
+        type: q.type as QuestionType,
+        points: q.points,
+        order: q.order,
+        options: parsedOptions as QuizQuestionOption[] | null,
+        answer: q.answer,
+      };
+    },
+  );
 
   return {
     questions,
-    attempts: attempts.map((a) => ({
+    attempts: attempts.map((a /*a has implicit any type error*/) => ({
       id: a.id,
       score: a.score,
       totalPoints: a.totalPoints,
       startedAt: a.startedAt.toISOString(),
       submittedAt: a.submittedAt!.toISOString(),
-      answers: a.answers.map((ans) => {
+      answers: a.answers.map((ans /*ans has implicit any type error*/) => {
         const raw = ans.response;
         const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
         return {
@@ -374,7 +444,7 @@ export async function getStudentAttemptDetail(attemptId: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const attempt = await prisma.quizAttempt.findFirst({
+  const attempt = (await prisma.quizAttempt.findFirst({
     where: { id: attemptId, userId: session.user.id },
     include: {
       answers: {
@@ -403,37 +473,50 @@ export async function getStudentAttemptDetail(attemptId: string) {
         },
       },
     },
-  }) as unknown as {
-    id: string; score: number | null; totalPoints: number | null;
-    startedAt: Date; submittedAt: Date | null;
+  })) as unknown as {
+    id: string;
+    score: number | null;
+    totalPoints: number | null;
+    startedAt: Date;
+    submittedAt: Date | null;
     answers: Array<{
-      id: string; questionId: string; response: unknown;
-      isCorrect: boolean | null; pointsAwarded: number | null;
+      id: string;
+      questionId: string;
+      response: unknown;
+      isCorrect: boolean | null;
+      pointsAwarded: number | null;
     }>;
     quiz: {
       questions: Array<{
-        id: string; text: string; type: QuestionType; points: number;
-        order: number; options: unknown; answer: string | null;
+        id: string;
+        text: string;
+        type: QuestionType;
+        points: number;
+        order: number;
+        options: unknown;
+        answer: string | null;
       }>;
     };
   } | null;
 
   if (!attempt) throw new Error("Attempt not found");
 
-  const questions = attempt.quiz.questions.map((q) => {
-    const rawOptions = q.options;
-    const parsedOptions =
-      typeof rawOptions === "string" ? JSON.parse(rawOptions) : rawOptions;
-    return {
-      id: q.id,
-      text: q.text,
-      type: q.type as QuestionType,
-      points: q.points,
-      order: q.order,
-      options: parsedOptions as QuizQuestionOption[] | null,
-      answer: q.answer,
-    };
-  });
+  const questions = attempt.quiz.questions.map(
+    (q /*q has implicit any type error*/) => {
+      const rawOptions = q.options;
+      const parsedOptions =
+        typeof rawOptions === "string" ? JSON.parse(rawOptions) : rawOptions;
+      return {
+        id: q.id,
+        text: q.text,
+        type: q.type as QuestionType,
+        points: q.points,
+        order: q.order,
+        options: parsedOptions as QuizQuestionOption[] | null,
+        answer: q.answer,
+      };
+    },
+  );
 
   return {
     attempt: {
@@ -442,17 +525,35 @@ export async function getStudentAttemptDetail(attemptId: string) {
       totalPoints: attempt.totalPoints,
       startedAt: attempt.startedAt.toISOString(),
       submittedAt: attempt.submittedAt!.toISOString(),
-      answers: attempt.answers.map((ans) => {
-        const raw = ans.response;
-        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-        return {
-          questionId: ans.questionId,
-          response: parsed as { label: string; text: string } | null,
-          isCorrect: ans.isCorrect,
-          pointsAwarded: ans.pointsAwarded ?? 0,
-        };
-      }),
+      answers: attempt.answers.map(
+        (ans /*ans has implicit any type error*/) => {
+          const raw = ans.response;
+          const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+          return {
+            questionId: ans.questionId,
+            response: parsed as { label: string; text: string } | null,
+            isCorrect: ans.isCorrect,
+            pointsAwarded: ans.pointsAwarded ?? 0,
+          };
+        },
+      ),
     },
     questions,
   };
+}
+
+export async function getAnsweredQuestions(
+  attemptId: string,
+): Promise<number[]> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const answers = await prisma.answer.findMany({
+    where: { attemptId, attempt: { userId: session.user.id } },
+    select: {
+      question: { select: { order: true } },
+    },
+  });
+
+  return answers.map((a /*a has implicit any type error*/) => a.question.order);
 }

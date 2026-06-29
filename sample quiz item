@@ -1,35 +1,62 @@
-1. Which of the following best describes a String in Java?
-   A. A primitive type that stores characters directly in the variable
-   B. A reference type that stores a reference (address) to an object containing the text
-   C. A keyword used only for printing output
-   D. A type that can only hold a single character
+1. What does UCD stand for?
+   A. Universal Computer Design
+   B. User-Centered Design
+   C. User Control Development
+   D. Unified Customer Design
+   Answer: B
+2. The primary focus of User-Centered Design is:
+   A. Hardware performance
+   B. Developer preferences
+   C. User needs and experiences
+   D. Programming languages
+   Answer: C
+3. Which of the following best describes User-Centered Design?
+   A. Designing systems based on developer assumptions
+   B. Designing systems based on user needs and feedback
+   C. Designing systems with the most features possible
+   D. Designing systems without user involvement
+   Answer: B
+4. Why is it important to involve users early in the design process?
+   A. To reduce internet usage
+   B. To increase storage capacity
+   C. To gather insights about user needs and problems
+   D. To reduce coding time only
+   Answer: C
+5. Which of the following is NOT a principle of User-Centered Design?
+   A. Understand users
+   B. Involve users early
+   C. Design based solely on developer opinions
+   D. Evaluate usability
+   Answer: C
+6. User-Centered Design follows an iterative process. What does "iterative" mean?
+   A. Design once and never revise
+   B. Repeatedly improve through testing and feedback
+   C. Build hardware components first
+   D. Focus only on documentation
+   Answer: B
+7. Which of the following is a benefit of User-Centered Design?
+   A. Increased user satisfaction
+   B. More programming errors
+   C. Reduced accessibility
+   D. Less user feedback
+   Answer: A
+8. Universal Design aims to create products that are:
+   A. Usable by the widest range of people possible
+   B. Designed only for expert users
+   C. Used only on mobile devices
+   D. Focused only on aesthetics
+   Answer: A
+9. Which of the following is an example of Universal Design?
+   A. Tiny buttons that require precision clicking
+   B. A website with no accessibility features
+   C. Closed captions for videos
+   D. A form requiring advanced technical knowledge
+   Answer: C
+10. What is the main goal of accessibility?
+    A. Improve internet speed
+    B. Ensure systems can be used by people with disabilities
+    C. Reduce software costs
+    D. Improve programming efficiency
+    Answer: B
 
-Which of the following best describes a String in Java?
-A. A primitive type that stores characters directly in the variable
-B. A reference type that stores a reference (address) to an object containing the text
-C. A keyword used only for printing output
-D. A type that can only hold a single character
-
-Which of the following best describes a String in Java?
-A primitive type that stores characters directly in the variable
-A reference type that stores a reference (address) to an object containing the text
-A keyword used only for printing output
-A type that can only hold a single character
-
-Which of the following best describes a String in Java?
-a A primitive type that stores characters directly in the variable
-b A reference type that stores a reference (address) to an object containing the text
-c A keyword used only for printing output
-d A type that can only hold a single character
-
-Which of the following best describes a String in Java
-a. A primitive type that stores characters directly in the variable
-b. A reference type that stores a reference (address) to an object containing the text
-c. A keyword used only for printing output
-d. A type that can only hold a single character
-
-Which of the following best describes a String in Java
-a.) A primitive type that stores characters directly in the variable
-b.) A reference type that stores a reference (address) to an object containing the text
-c.) A keyword used only for printing output
-d.) A type that can only hold a single character
+Answer: \* - This should be optional but remind the user to update the correct answer after creating the questions or create a clear indication that the user still needs to select the correct choice. this is for MCQ for now, there will be different formats for different question types, keep the code modular.
